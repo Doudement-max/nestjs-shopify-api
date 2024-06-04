@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { LineItem} from "./create.order.dto";
 
-export class OrderResposeDto{  
+export class ResposeOrderDto{  
     @ApiProperty()
     id: number;
   
