@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { LineItem } from "./create.order.dto";
+import { LineItemDto } from "./lineitem.dto";
 
 export class UpdateOrderDto {
     @ApiProperty({required: false})
@@ -11,8 +11,8 @@ export class UpdateOrderDto {
     @ApiProperty({ required: false })
     readonly total?: number;
 
-    @ApiProperty({type:[LineItem], required: false })
-    lineItem?: LineItem[];
+    @ApiProperty({type:[LineItemDto], required: false })
+    lineItem?: LineItemDto[];
 
     @ApiProperty({ required: false})
     totalTax: string;

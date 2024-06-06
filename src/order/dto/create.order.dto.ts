@@ -1,22 +1,23 @@
 import { ApiProperty } from "@nestjs/swagger";
-
-export class LineItem {
-  @ApiProperty()
-  title: string;
-
-  @ApiProperty()
-  price: number;
-
-  @ApiProperty()
-  quantity: number;
-}
+import { LineItemDto } from "./lineitem.dto";
 
 export class CreateOrderDto {
+  @ApiProperty()
   readonly customer: string;
+
+  @ApiProperty()
   readonly items: string[];
+
+  @ApiProperty()
   readonly total: number;
-  lineItems: LineItem[];
+
+  @ApiProperty({ type: [LineItemDto] })
+  lineItems: LineItemDto[];
+
+  @ApiProperty()
   totalTax: string;
+
+  @ApiProperty()
   currency: string;
 
   @ApiProperty()
@@ -25,50 +26,9 @@ export class CreateOrderDto {
   @ApiProperty()
   email: string;
 
-  @ApiProperty({ type: [LineItem] })
-  line_items: LineItem[];
+  @ApiProperty({ type: [LineItemDto] })
+  line_items: LineItemDto[];
 
+  @ApiProperty()
   data: Date;
-}
-
-export class UpdateOrderDto {
-  readonly items?: string[];
-  readonly total?: number;
-}
-
-export class GetOrderDto {
-  readonly id: string;
-}
-
-class ShopMoney {
-  @ApiProperty()
-  amount: string;
-
-  @ApiProperty()
-  currency_code: string;
-}
-
-class CurrentSubtotalPriceSet {
-  @ApiProperty({ type: ShopMoney })
-  shop_money: ShopMoney;
-
-  @ApiProperty({ type: ShopMoney })
-  presentment_money: ShopMoney;
-}
-
-export class OrderResponse {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  email: string;
-
-  @ApiProperty()
-  created_at: string;
-
-  @ApiProperty()
-  updated_at: string;
-
-  @ApiProperty({ type: CurrentSubtotalPriceSet })
-  current_subtotal_price_set: CurrentSubtotalPriceSet;
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { LineItem} from "./create.order.dto";
+import { LineItemDto } from "./lineitem.dto";
 
 export class ResposeOrderDto{  
     @ApiProperty()
@@ -14,8 +14,8 @@ export class ResposeOrderDto{
     @ApiProperty()
     total: number;
   
-    @ApiProperty({ type: [LineItem] })
-    lineItems: LineItem[];
+    @ApiProperty({ type: [LineItemDto] })
+    lineItems: LineItemDto[];
   
     @ApiProperty()
     totalTax: string;
