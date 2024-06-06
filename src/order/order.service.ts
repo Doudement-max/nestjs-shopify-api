@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { orderModel } from './order.model';
 import { CreateOrderDto } from './dto/create.order.dto';
 import { UpdateOrderDto } from './dto/update.order.dto';
-import { ResposeOrderDto } from './dto/response.order.dto';
+import { ResponseOrderDto } from './dto/response.order.dto';
 import { FulfillmentDto } from './dto/fulfillment.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { OrderCancelDto } from './dto/cancel.order.dto';
@@ -12,38 +12,47 @@ import { OrderCancelDto } from './dto/cancel.order.dto';
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(orderModel.name) private readonly orderModel: Model<orderModel>
+    @InjectModel(orderModel.name) private readonly orderModel: Model<any>
   ) {}
 
-  async findAll(): Promise<orderModel[]> {
-    return this.orderModel.find().exec();
+  async findAll(): Promise<ResponseOrderDto[]> {
+    const orders = await this.orderModel.find().exec();
+    return orders.map(order => order as ResponseOrderDto);
   }
 
-  async findOne(id: string): Promise<orderModel> {
-    return this.orderModel.findById(id).exec();
+  async findOne(id: string): Promise<ResponseOrderDto> {
+    const order = await this.orderModel.findById(id).exec();
+    return order as ResponseOrderDto;
   }
 
-  async create(order: CreateOrderDto): Promise<orderModel> {
+  async create(order: CreateOrderDto): Promise<ResponseOrderDto> {
     const newOrder = new this.orderModel(order);
-    return newOrder.save();
+    const savedOrder = await newOrder.save();
+    return savedOrder as ResponseOrderDto;
   }
 
-  async update(id: string, order: UpdateOrderDto): Promise<orderModel> {
-    return this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();
+  async update(id: string, order: UpdateOrderDto): Promise<ResponseOrderDto> {
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();
+    return updatedOrder as ResponseOrderDto;
   }
 
-  async remove(id: string): Promise<any> {
-    return this.orderModel.findByIdAndDelete(id).exec();
+  async remove(id: string): Promise<ResponseOrderDto> {
+    const deletedOrder = await this.orderModel.findByIdAndDelete(id).exec();
+    return deletedOrder as ResponseOrderDto;
   }
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<orderModel> {
-    try {
-      const newOrder = new this.orderModel(createOrderDto);
-      await newOrder.save();
-      return newOrder;
-    } catch (error) {
-      console.error('Erro ao criar a ordem:', error.message);
-      throw new Error('Não foi possível criar a ordem.');
-    }
+  async addTransaction(orderId: string, transaction: TransactionDto): Promise<ResponseOrderDto> {
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(orderId, { $push: { transactions: transaction } }, { new: true }).exec();
+    return updatedOrder as ResponseOrderDto;
+  }
+
+  async addFulfillment(orderId: string, fulfillment: FulfillmentDto): Promise<ResponseOrderDto> {
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(orderId, { $push: { fulfillments: fulfillment } }, { new: true }).exec();
+    return updatedOrder as ResponseOrderDto;
+  }
+
+  async cancelOrder(id: string, cancelDetails: OrderCancelDto): Promise<ResponseOrderDto> {
+    const updatedOrder = await this.orderModel.findByIdAndUpdate(id, { status: 'cancelled', cancelDetails }, { new: true }).exec();
+    return updatedOrder as ResponseOrderDto;
   }
 }
