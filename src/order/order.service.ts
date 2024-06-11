@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { orderModel } from './order.model';
-import { CreateOrderDto } from './dto/create.order.dto';
+import { CreateOrderSchemaType } from './dto/create.order.dto';
 import { UpdateOrderDto } from './dto/update.order.dto';
 import { ResponseOrderDto } from './dto/response.order.dto';
 import { FulfillmentDto } from './dto/fulfillment.dto';
@@ -25,8 +25,8 @@ export class OrderService {
     return order as ResponseOrderDto;
   }
 
-  async create(order: CreateOrderDto): Promise<ResponseOrderDto> {
-    const newOrder = new this.orderModel(order);
+  async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
+    const newOrder = new this.orderModel(createOrderDto);
     const savedOrder = await newOrder.save();
     return savedOrder as ResponseOrderDto;
   }

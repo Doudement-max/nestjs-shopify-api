@@ -1,5 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { LineItemDto } from "./lineitem.dto";
+
+import { ApiProperty } from '@nestjs/swagger';
+import { LineItemDto } from './lineitem.dto';
+import { z } from 'zod';
 
 export class CreateOrderDto {
   @ApiProperty()
@@ -15,20 +17,35 @@ export class CreateOrderDto {
   lineItems: LineItemDto[];
 
   @ApiProperty()
-  totalTax: string;
+  readonly totalTax: string;
 
   @ApiProperty()
-  currency: string;
+  readonly currency: string;
 
   @ApiProperty()
-  id: number;
+  readonly id: number;
 
   @ApiProperty()
-  email: string;
+  readonly email: string;
 
   @ApiProperty({ type: [LineItemDto] })
   line_items: LineItemDto[];
 
   @ApiProperty()
-  data: Date;
+  readonly data: Date; 
 }
+
+export const createOrderSchema = z.object({
+  customer: z.string(),
+  items: z.array(z.string()),
+  total: z.number(),
+  lineItems: z.array(z.object({id: z.number(), name: z.string() })),
+  totalTax: z.string(),
+  currency: z.string(),
+  id: z.number(),
+  email: z.string().email(),
+  line_items: z.array(z.object({id: z.number(), name: z.string() })),
+  data: z.date(),
+});
+
+export type CreateOrderSchemaType = z.infer<typeof createOrderSchema>;
