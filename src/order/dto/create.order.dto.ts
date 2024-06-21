@@ -1,7 +1,7 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import { LineItemDto } from './lineitem.dto';
-import { z } from 'zod';
+import { z } from 'zod'
 
 export class CreateOrderDto {
   @ApiProperty()
@@ -46,6 +46,8 @@ export const createOrderSchema = z.object({
   email: z.string().email(),
   line_items: z.array(z.object({id: z.number(), name: z.string() })),
   data: z.date(),
+  productId: z.string(), 
+  quantity: z.number().min(1), 
 });
 
 export type CreateOrderSchemaType = z.infer<typeof createOrderSchema>;

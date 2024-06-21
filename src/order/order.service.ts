@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { orderModel } from './order.model';
@@ -8,11 +8,13 @@ import { ResponseOrderDto } from './dto/response.order.dto';
 import { FulfillmentDto } from './dto/fulfillment.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { OrderCancelDto } from './dto/cancel.order.dto';
-
+import { ProductService } from 'src/product/product.service';
 @Injectable()
 export class OrderService {
   constructor(
-    @InjectModel(orderModel.name) private readonly orderModel: Model<any>
+    @InjectModel(orderModel.name) private readonly orderModel: Model<any>,
+    @Inject(forwardRef(() => ProductService)) private readonly productService: 
+    ProductService,
   ) {}
 
   async findAll(): Promise<ResponseOrderDto[]> {
@@ -27,9 +29,15 @@ export class OrderService {
 
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
     const newOrder = new this.orderModel(createOrderDto);
-    const savedOrder = await newOrder.save();
+    const savedOrder = await newOrder.save(); 
+    const { productId, quantity } = createOrderDto;
+      const product = await this.productService.findOne(productId);
+      if (!product) {
+        throw new NotFoundException('Produto não encontrado');
+      }
     return savedOrder as ResponseOrderDto;
-  }
+  } 
+
 
   async update(id: string, order: UpdateOrderDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();

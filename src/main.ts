@@ -11,7 +11,8 @@ async function bootstrap() {
     .setTitle('API Shopify')
     .setDescription('Documentação da API Shopify')
     .setVersion('1.0')
-    .addTag('Order')
+    .addTag('Product')
+    .addTag('Order') 
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
