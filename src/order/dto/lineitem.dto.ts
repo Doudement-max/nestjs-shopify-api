@@ -8,5 +8,6 @@ export class LineItemDto {
   price: number;
 
   @ApiProperty()
-  quantity: number;
+  quantity: number; 
+
 }

@@ -9,12 +9,12 @@ import { FulfillmentDto } from './dto/fulfillment.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { OrderCancelDto } from './dto/cancel.order.dto';
 import { ProductService } from 'src/product/product.service';
+
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(orderModel.name) private readonly orderModel: Model<any>,
-    @Inject(forwardRef(() => ProductService)) private readonly productService: 
-    ProductService,
+    @Inject(forwardRef(() => ProductService)) private readonly productService: ProductService,
   ) {}
 
   async findAll(): Promise<ResponseOrderDto[]> {
@@ -28,16 +28,18 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
+    const { productId, quantity } = createOrderDto;
+
+    
+    const product = await this.productService.findOne(productId);
+    if (!product) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
     const newOrder = new this.orderModel(createOrderDto);
     const savedOrder = await newOrder.save(); 
-    const { productId, quantity } = createOrderDto;
-      const product = await this.productService.findOne(productId);
-      if (!product) {
-        throw new NotFoundException('Produto não encontrado');
-      }
     return savedOrder as ResponseOrderDto;
-  } 
-
+  }
 
   async update(id: string, order: UpdateOrderDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();
