@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AddressDto } from './address.dto';
 
 export class CustomerDto {
   @ApiProperty({ description: 'Nome do cliente', example: 'John' })
@@ -15,4 +16,7 @@ export class CustomerDto {
 
   @ApiProperty({ description: 'Pedidos do cliente', example: ['order1', 'order2'] })
   orders: string[];
+
+  @ApiProperty({ description: 'Endereços do cliente', type: [AddressDto] })
+  addresses: AddressDto[];
 }
