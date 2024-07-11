@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 
 export const createOrderSchema = z.object({
+  customerId: z.string(),
   customer: z.string(),
   items: z.array(z.string()),
   total: z.number(),
@@ -66,7 +67,8 @@ export class CreateOrderDto {
 
   @ApiProperty({ description: 'Itens do pedido', type: [LineItemDto] })
   lineItems: LineItemDto[];
-  
+  @ApiProperty({description:'ID do cliente'})
+  customerId: number;
 }
 
 

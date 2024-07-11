@@ -4,7 +4,9 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ResponseOrderDto } from './dto/response.order.dto';
 
-const OrderSchemaZod = z.object({
+const OrderSchemaZod = z.object({ 
+  productId: z.string(), 
+  customerId: z.string(),
   name: z.string(),
   customer: z.string().min(1),
   status: z.string().min(1),
@@ -12,7 +14,7 @@ const OrderSchemaZod = z.object({
   data: z.date(),
   totalAmount: z.number().min(0),
   cancelDate: z.date().optional(),
-  cancelDetails: z.record(z.unknown()).optional(),
+  cancelDetails: z.record(z.any()).optional(),
 });
 
 @Schema()
@@ -21,7 +23,7 @@ export class orderModel extends Document {
   name: string;
 
   @Prop({required: true})
-  customer: string; 
+  customerId: string; 
 
   @Prop({ required: true })
   status: string;
@@ -39,10 +41,10 @@ export class orderModel extends Document {
   cancelDate: Date;
 
   @Prop({type: Object})
-  cancelDetails: unknown;
+  cancelDetails: any;
   orderModel: any;
 
-  async create(createOrderDto: unknown): Promise<ResponseOrderDto> {
+  async create(createOrderDto: any): Promise<ResponseOrderDto> {
     
     const validatedData = OrderSchemaZod.parse(createOrderDto);
     const newOrder = new this.orderModel(validatedData as CreateOrderSchemaType);

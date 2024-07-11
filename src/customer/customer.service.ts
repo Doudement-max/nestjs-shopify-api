@@ -3,13 +3,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Customer } from './customer.schema';
 import { CustomerDto } from './dto/customer.dto';
+import { ShopifyService } from './shopify.customer.service';
 
 @Injectable()
 export class CustomerService {
-  constructor(@InjectModel(Customer.name) private readonly customerModel: Model<Customer>) {}
+  constructor(
+    @InjectModel(Customer.name) private readonly customerModel: Model<Customer>,
+    private readonly shopifyService: ShopifyService
+  ) {}
 
   async findAll(): Promise<CustomerDto[]> {
-    return this.customerModel.find().exec();
+    const customers = await this.customerModel.find().exec();
+    return customers.map(customer => this.toCustomerDto(customer));
   }
 
   async findOne(id: string): Promise<CustomerDto> {
@@ -17,12 +22,25 @@ export class CustomerService {
     if (!customer) {
       throw new NotFoundException('Customer not found');
     }
-    return customer;
+    return this.toCustomerDto(customer);
   }
 
   async create(createCustomerDto: CustomerDto): Promise<CustomerDto> {
     const newCustomer = new this.customerModel(createCustomerDto);
-    return newCustomer.save();
+    const savedCustomer = await newCustomer.save();
+
+    const shopifyCustomerId = await this.shopifyService.createCustomer({
+      first_name: createCustomerDto.firstName,
+      last_name: createCustomerDto.lastName,
+      email: createCustomerDto.email,
+      phone: createCustomerDto.phone,
+      tags: createCustomerDto.orders.join(','),
+    });
+
+    savedCustomer.shopifyId = shopifyCustomerId;
+    await savedCustomer.save();
+
+    return this.toCustomerDto(savedCustomer);
   }
 
   async update(id: string, updateCustomerDto: CustomerDto): Promise<CustomerDto> {
@@ -30,7 +48,16 @@ export class CustomerService {
     if (!updatedCustomer) {
       throw new NotFoundException('Customer not found');
     }
-    return updatedCustomer;
+
+    await this.shopifyService.updateCustomer(updatedCustomer.shopifyId, {
+      first_name: updateCustomerDto.firstName,
+      last_name: updateCustomerDto.lastName,
+      email: updateCustomerDto.email,
+      phone: updateCustomerDto.phone,
+      tags: updateCustomerDto.orders.join(','),
+    });
+
+    return this.toCustomerDto(updatedCustomer);
   }
 
   async remove(id: string): Promise<CustomerDto> {
@@ -38,6 +65,22 @@ export class CustomerService {
     if (!deletedCustomer) {
       throw new NotFoundException('Customer not found');
     }
-    return deletedCustomer;
+
+    await this.shopifyService.deleteCustomer(deletedCustomer.shopifyId);
+
+    return this.toCustomerDto(deletedCustomer);
+  }
+
+  private toCustomerDto(customer: Customer): CustomerDto {
+    return {
+      customerId: customer.customerId,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+      orders: customer.orders,
+      addresses: customer.addresses,
+      shopifyId: customer.shopifyId,
+    };
   }
 }

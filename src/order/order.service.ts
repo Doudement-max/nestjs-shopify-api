@@ -9,12 +9,14 @@ import { FulfillmentDto } from './dto/fulfillment.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { OrderCancelDto } from './dto/cancel.order.dto';
 import { ProductService } from 'src/product/product.service';
+import { CustomerService } from 'src/customer/customer.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(orderModel.name) private readonly orderModel: Model<any>,
     @Inject(forwardRef(() => ProductService)) private readonly productService: ProductService,
+    @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
   ) {}
 
   async findAll(): Promise<ResponseOrderDto[]> {
@@ -27,8 +29,13 @@ export class OrderService {
     return order as ResponseOrderDto;
   }
 
+  async findOrdersByCustomerId(customerId: string): Promise<ResponseOrderDto[]> {
+    const orders = await this.orderModel.find({ customerId }).exec();
+    return orders.map(order => order as ResponseOrderDto);
+  }
+
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
-    const { productId, quantity } = createOrderDto;
+    const { productId, customerId, quantity } = createOrderDto;
 
     
     const product = await this.productService.findOne(productId);
@@ -36,8 +43,27 @@ export class OrderService {
       throw new NotFoundException('Produto não encontrado');
     }
 
+    
+    const customer = await this.customerService.findOne(customerId);
+    if (!customer) {
+      throw new NotFoundException('Cliente não encontrado');
+    }
+
     const newOrder = new this.orderModel(createOrderDto);
-    const savedOrder = await newOrder.save(); 
+    const savedOrder = await newOrder.save();
+
+    
+    customer.orders.push(savedOrder._id.toString());
+    await this.customerService.update(customerId, {
+      orders: customer.orders,
+      customerId: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      addresses: []
+    });
+
     return savedOrder as ResponseOrderDto;
   }
 

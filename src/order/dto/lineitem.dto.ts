@@ -1,13 +1,18 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LineItemDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'ID do item' })
+  id: number;
+
+  @ApiProperty({ description: 'Nome do item' })
+  name: string;
+
+  @ApiProperty({ description: 'Título do item' })
   title: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Preço do item' })
   price: number;
 
-  @ApiProperty()
-  quantity: number; 
-
+  @ApiProperty({ description: 'Quantidade do item' })
+  quantity: number;
 }
