@@ -68,7 +68,7 @@ export class CreateOrderDto {
   @ApiProperty({ description: 'Itens do pedido', type: [LineItemDto] })
   lineItems: LineItemDto[];
   @ApiProperty({description:'ID do cliente'})
-  customerId: number;
+  customerId: string;
 }
 
 

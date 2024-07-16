@@ -50,7 +50,7 @@ export class ShopifyService {
     ));
 
     if (response.status !== 200) {
-      throw new Error('Failed to update customer in Shopify');
+      throw new Error('FFalha ao atualizar o cliente no Shopify');
     }
   }
 
@@ -66,7 +66,7 @@ export class ShopifyService {
     ));
 
     if (response.status !== 200 && response.status !== 204) {
-      throw new Error('Failed to delete customer in Shopify');
+      throw new Error('Falha ao excluir cliente no Shopify');
     }
   }
 }
