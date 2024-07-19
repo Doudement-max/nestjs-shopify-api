@@ -18,11 +18,12 @@ export class CustomerDto {
   phone: string;
 
   @ApiProperty({ description: 'Pedidos do cliente', example: ['order1', 'order2'] })
-  orders: string[];
+  order: string[];
 
   @ApiProperty({ description: 'Endereços do cliente', type: [AddressDto] })
   addresses: AddressDto[]; 
 
   @ApiProperty({ description: 'ID do cliente na Shopify', required: false })
   shopifyId?: string;
+
 }

@@ -1,14 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Customer } from './customer.schema';
-import { CustomerDto } from './dto/customer.dto';
+import { CustomerModel, validateCustomer } from './customer.schema';
+import { CustomerDto } from './dto/customer.dto'; 
+import { AddressDto } from './dto/address.dto';
 import { ShopifyService } from './shopify.customer.service';
 
 @Injectable()
 export class CustomerService {
   constructor(
-    @InjectModel(Customer.name) private readonly customerModel: Model<Customer>,
+    @InjectModel(CustomerModel.modelName) private readonly customerModel: Model<CustomerModel>,
     private readonly shopifyService: ShopifyService
   ) {}
 
@@ -29,6 +30,13 @@ export class CustomerService {
   }
 
   async create(createCustomerDto: CustomerDto): Promise<CustomerDto> {
+    try {
+      validateCustomer(createCustomerDto); // Validando com Zod
+    } catch (error) {
+      console.error(`Validation error: ${error}`);
+      throw new BadRequestException('Invalid customer data');
+    }
+
     const newCustomer = new this.customerModel(createCustomerDto);
     const savedCustomer = await newCustomer.save();
 
@@ -37,7 +45,7 @@ export class CustomerService {
       last_name: createCustomerDto.lastName,
       email: createCustomerDto.email,
       phone: createCustomerDto.phone,
-      tags: createCustomerDto.orders.join(','),
+      tags: createCustomerDto.order.join(','),
     });
 
     savedCustomer.shopifyId = shopifyCustomerId;
@@ -48,6 +56,13 @@ export class CustomerService {
   }
 
   async update(id: string, updateCustomerDto: CustomerDto): Promise<CustomerDto> {
+    try {
+      validateCustomer(updateCustomerDto); // Validando com Zod
+    } catch (error) {
+      console.error(`Validation error: ${error}`);
+      throw new BadRequestException('Invalid customer data');
+    }
+
     const updatedCustomer = await this.customerModel.findByIdAndUpdate(id, updateCustomerDto, { new: true }).exec();
     if (!updatedCustomer) {
       console.log(`Customer with ID ${id} not found`);
@@ -59,7 +74,7 @@ export class CustomerService {
       last_name: updateCustomerDto.lastName,
       email: updateCustomerDto.email,
       phone: updateCustomerDto.phone,
-      tags: updateCustomerDto.orders.join(','),
+      tags: updateCustomerDto.order.join(','),
     });
 
     console.log(`Customer updated: ${JSON.stringify(updatedCustomer)}`);
@@ -79,15 +94,15 @@ export class CustomerService {
     return this.toCustomerDto(deletedCustomer);
   }
 
-  private toCustomerDto(customer: Customer): CustomerDto {
+  private toCustomerDto(customer: CustomerModel): CustomerDto {
     return {
       customerId: customer.customerId,
       firstName: customer.firstName,
       lastName: customer.lastName,
       email: customer.email,
       phone: customer.phone,
-      orders: customer.orders,
-      addresses: customer.addresses,
+      order: customer.order,
+      addresses: customer.addresses as unknown as AddressDto[], 
       shopifyId: customer.shopifyId,
     };
   }

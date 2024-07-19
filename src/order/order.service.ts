@@ -20,9 +20,9 @@ export class OrderService {
   ) {}
 
   async findAll(): Promise<ResponseOrderDto[]> {
-    const orders = await this.orderModel.find().exec();
-    console.log(`Orders retrieved: ${JSON.stringify(orders)}`);
-    return orders.map(order => order as ResponseOrderDto);
+    const order = await this.orderModel.find().exec();
+    console.log(`Pedido Recuperado: ${JSON.stringify(order)}`);
+    return order.map(order => order as ResponseOrderDto);
   }
 
   async findOne(id: string): Promise<ResponseOrderDto> {
@@ -35,10 +35,10 @@ export class OrderService {
     return order as ResponseOrderDto;
   }
 
-  async findOrdersByCustomerId(customerId: string): Promise<ResponseOrderDto[]> {
-    const orders = await this.orderModel.find({ customerId }).exec();
-    console.log(`Orders for customer ID ${customerId} retrieved: ${JSON.stringify(orders)}`);
-    return orders.map(order => order as ResponseOrderDto);
+  async findOrderByCustomerId(customerId: string): Promise<ResponseOrderDto[]> {
+    const order = await this.orderModel.find({ customerId }).exec();
+    console.log(`Pedido para Cliente ID ${customerId} recuperada: ${JSON.stringify(order)}`);
+    return order.map(order => order as ResponseOrderDto);
   }
 
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
@@ -59,9 +59,9 @@ export class OrderService {
     const newOrder = new this.orderModel(createOrderDto);
     const savedOrder = await newOrder.save();
 
-    customer.orders.push(savedOrder._id.toString());
+    customer.order.push(savedOrder._id.toString());
     await this.customerService.update(customerId, {
-      orders: customer.orders,
+      order: customer.order,
       customerId: '',
       firstName: '',
       lastName: '',
