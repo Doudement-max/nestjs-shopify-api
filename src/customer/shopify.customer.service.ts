@@ -31,7 +31,7 @@ export class ShopifyService {
     ));
 
     if (response.status !== 201) {
-      throw new Error('Failed to create customer in Shopify');
+      throw new Error('Falha ao criar cliente no Shopify');
     }
 
     return response.data.customer.id;
@@ -50,7 +50,7 @@ export class ShopifyService {
     ));
 
     if (response.status !== 200) {
-      throw new Error('FFalha ao atualizar o cliente no Shopify');
+      throw new Error('Falha ao atualizar o cliente no Shopify');
     }
   }
 

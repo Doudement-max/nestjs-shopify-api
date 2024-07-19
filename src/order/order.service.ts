@@ -21,38 +21,44 @@ export class OrderService {
 
   async findAll(): Promise<ResponseOrderDto[]> {
     const orders = await this.orderModel.find().exec();
+    console.log(`Orders retrieved: ${JSON.stringify(orders)}`);
     return orders.map(order => order as ResponseOrderDto);
   }
 
   async findOne(id: string): Promise<ResponseOrderDto> {
     const order = await this.orderModel.findById(id).exec();
+    if (!order) {
+      console.log(`Order with ID ${id} not found`);
+      throw new NotFoundException('Order not found');
+    }
+    console.log(`Order retrieved: ${JSON.stringify(order)}`);
     return order as ResponseOrderDto;
   }
 
   async findOrdersByCustomerId(customerId: string): Promise<ResponseOrderDto[]> {
     const orders = await this.orderModel.find({ customerId }).exec();
+    console.log(`Orders for customer ID ${customerId} retrieved: ${JSON.stringify(orders)}`);
     return orders.map(order => order as ResponseOrderDto);
   }
 
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
     const { productId, customerId, quantity } = createOrderDto;
 
-    
     const product = await this.productService.findOne(productId);
     if (!product) {
+      console.log(`Product with ID ${productId} not found`);
       throw new NotFoundException('Produto não encontrado');
     }
 
-    
     const customer = await this.customerService.findOne(customerId);
     if (!customer) {
+      console.log(`Customer with ID ${customerId} not found`);
       throw new NotFoundException('Cliente não encontrado');
     }
 
     const newOrder = new this.orderModel(createOrderDto);
     const savedOrder = await newOrder.save();
 
-    
     customer.orders.push(savedOrder._id.toString());
     await this.customerService.update(customerId, {
       orders: customer.orders,
@@ -64,31 +70,49 @@ export class OrderService {
       addresses: []
     });
 
+    console.log(`Order created: ${JSON.stringify(savedOrder)}`);
     return savedOrder as ResponseOrderDto;
   }
 
   async update(id: string, order: UpdateOrderDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();
+    if (!updatedOrder) {
+      console.log(`Order with ID ${id} not found`);
+      throw new NotFoundException('Pedido não encontrado');
+    }
+    console.log(`Order updated: ${JSON.stringify(updatedOrder)}`);
     return updatedOrder as ResponseOrderDto;
   }
 
   async remove(id: string): Promise<ResponseOrderDto> {
     const deletedOrder = await this.orderModel.findByIdAndDelete(id).exec();
+    if (!deletedOrder) {
+      console.log(`Order with ID ${id} not found`);
+      throw new NotFoundException('Pedido não encontrado');
+    }
+    console.log(`Order removed: ${JSON.stringify(deletedOrder)}`);
     return deletedOrder as ResponseOrderDto;
   }
 
   async addTransaction(orderId: string, transaction: TransactionDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(orderId, { $push: { transactions: transaction } }, { new: true }).exec();
+    console.log(`Transaction added to order ID ${orderId}: ${JSON.stringify(transaction)}`);
     return updatedOrder as ResponseOrderDto;
   }
 
   async addFulfillment(orderId: string, fulfillment: FulfillmentDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(orderId, { $push: { fulfillments: fulfillment } }, { new: true }).exec();
+    console.log(`Fulfillment added to order ID ${orderId}: ${JSON.stringify(fulfillment)}`);
     return updatedOrder as ResponseOrderDto;
   }
 
   async cancelOrder(id: string, cancelDetails: OrderCancelDto): Promise<ResponseOrderDto> {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, { status: 'cancelled', cancelDetails }, { new: true }).exec();
+    if (!updatedOrder) {
+      console.log(`Order with ID ${id} not found`);
+      throw new NotFoundException('Pedido não encontrado');
+    }
+    console.log(`Order ID ${id} cancelled: ${JSON.stringify(cancelDetails)}`);
     return updatedOrder as ResponseOrderDto;
   }
 }
