@@ -9,12 +9,12 @@ import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [ 
+  imports: [
     ConfigModule.forRoot({
-      isGlobal:true, 
+      isGlobal: true,
       envFilePath: '.env',
-}), 
-HttpModule,
+    }),
+    HttpModule,
     MongooseModule.forRoot(databaseConfig.uri, {
       maxPoolSize: databaseConfig.maxPoolSize,
     }),

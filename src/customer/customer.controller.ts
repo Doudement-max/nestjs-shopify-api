@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { CustomerDto } from './dto/customer.dto';
+import { CustomerDto, CreateCustomerDto, UpdateCustomerDto } from './dto/customer.dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Customer')
@@ -25,15 +25,15 @@ export class CustomerController {
   @Post()
   @ApiOperation({ summary: 'Criar um novo cliente' })
   @ApiResponse({ status: 201, description: 'Cliente criado com sucesso', type: CustomerDto })
-  async create(@Body() customer: CustomerDto): Promise<CustomerDto> {
-    return this.customerService.create(customer);
+  async create(@Body() createCustomerDto: CreateCustomerDto): Promise<CustomerDto> {
+    return this.customerService.create(createCustomerDto);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar um cliente pelo ID' })
   @ApiResponse({ status: 200, description: 'Cliente atualizado com sucesso', type: CustomerDto })
-  async update(@Param('id') id: string, @Body() customer: CustomerDto): Promise<CustomerDto> {
-    return this.customerService.update(id, customer);
+  async update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto): Promise<CustomerDto> {
+    return this.customerService.update(id, updateCustomerDto);
   }
 
   @Delete(':id')

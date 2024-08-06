@@ -1,7 +1,13 @@
 import { MongooseModuleOptions } from '@nestjs/mongoose';
 
-export const databaseConfig: MongooseModuleOptions = {
-  uri: process.env.MONGO_URI || 'mongodb://localhost:27017/shopify',
+const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/shopify';
+const maxPoolSize = parseInt(process.env.POOL_SIZE || '5', 10);
 
-  maxPoolSize: parseInt(process.env.POOL_SIZE!) || 5, 
+if (isNaN(maxPoolSize)) {
+  throw new Error('Invalid POOL_SIZE environment variable');
+}
+
+export const databaseConfig: MongooseModuleOptions = {
+  uri,
+  maxPoolSize,
 };

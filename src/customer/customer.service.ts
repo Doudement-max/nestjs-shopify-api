@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CustomerModel, validateCustomer } from './customer.schema';
-import { CustomerDto } from './dto/customer.dto'; 
-import { AddressDto } from './dto/address.dto';
+import { CreateCustomerDto, UpdateCustomerDto, CustomerDto } from './dto/customer.dto';
 import { ShopifyService } from './shopify.customer.service';
+import { AddressDto } from './dto/address.dto';
 
 @Injectable()
 export class CustomerService {
   constructor(
-    @InjectModel(CustomerModel.modelName) private readonly customerModel: Model<CustomerModel>,
+    @InjectModel('Customer') private readonly customerModel: Model<CustomerModel>,  // Certifique-se que o nome do modelo está correto
     private readonly shopifyService: ShopifyService
   ) {}
 
@@ -29,7 +29,7 @@ export class CustomerService {
     return this.toCustomerDto(customer);
   }
 
-  async create(createCustomerDto: CustomerDto): Promise<CustomerDto> {
+  async create(createCustomerDto: CreateCustomerDto): Promise<CustomerDto> {
     try {
       validateCustomer(createCustomerDto); // Validando com Zod
     } catch (error) {
@@ -55,7 +55,7 @@ export class CustomerService {
     return this.toCustomerDto(savedCustomer);
   }
 
-  async update(id: string, updateCustomerDto: CustomerDto): Promise<CustomerDto> {
+  async update(id: string, updateCustomerDto: UpdateCustomerDto): Promise<CustomerDto> {
     try {
       validateCustomer(updateCustomerDto); // Validando com Zod
     } catch (error) {
@@ -84,11 +84,14 @@ export class CustomerService {
   async remove(id: string): Promise<CustomerDto> {
     const deletedCustomer = await this.customerModel.findByIdAndDelete(id).exec();
     if (!deletedCustomer) {
-      console.log(`Customer with ID ${id} not found`);
       throw new NotFoundException('Customer not found');
     }
 
-    await this.shopifyService.deleteCustomer(deletedCustomer.shopifyId);
+    try {
+      await this.shopifyService.deleteCustomer(deletedCustomer.shopifyId);
+    } catch (error) {
+      throw new InternalServerErrorException('Error deleting customer in Shopify');
+    }
 
     console.log(`Customer removed: ${JSON.stringify(deletedCustomer)}`);
     return this.toCustomerDto(deletedCustomer);
@@ -102,7 +105,7 @@ export class CustomerService {
       email: customer.email,
       phone: customer.phone,
       order: customer.order,
-      addresses: customer.addresses as unknown as AddressDto[], 
+      addresses: customer.addresses as AddressDto[],
       shopifyId: customer.shopifyId,
     };
   }
