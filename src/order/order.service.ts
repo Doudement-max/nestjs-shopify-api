@@ -62,12 +62,12 @@ export class OrderService {
     customer.order.push(savedOrder._id.toString());
     await this.customerService.update(customerId, {
       order: customer.order,
-      customerId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      addresses: []
+      customerId: customer.customerId,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+      addresses: customer.addresses || [],
     });
 
     console.log(`Order created: ${JSON.stringify(savedOrder)}`);

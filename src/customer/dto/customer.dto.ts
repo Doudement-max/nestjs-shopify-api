@@ -1,84 +1,135 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { AddressDto } from './address.dto';
+/*import { z } from 'zod';
+import { customerSchemaZod } from '../customer.model';
 
+// DTO para Address
+export class AddressDto {
+  address1: string;
+  address2?: string;
+  city: string;
+  company?: string;
+  country: string;
+  countryCode: string;
+  countryName: string;
+  name: string;
+  phone: string;
+  province: string;
+  provinceCode: string;
+  zip: string;
+  default?: boolean;
+}
+
+// DTO para Customer
 export class CustomerDto {
-  @ApiProperty({ description: 'ID do cliente', example: '60d21b4667d0d8992e610c85' })
   customerId: string;
-
-  @ApiProperty({ description: 'Nome do cliente', example: 'John' })
   firstName: string;
-
-  @ApiProperty({ description: 'Sobrenome do cliente', example: 'Doe' })
   lastName: string;
-
-  @ApiProperty({ description: 'Email do cliente', example: 'john.doe@example.com' })
   email: string;
-
-  @ApiProperty({ description: 'Telefone do cliente', example: '+123456789', required: false })
   phone?: string;
-
-  @ApiProperty({ description: 'Pedidos do cliente', example: ['order1', 'order2'], required: false })
   order?: string[];
-
-  @ApiProperty({ description: 'Endereços do cliente', type: [AddressDto], required: false })
   addresses?: AddressDto[];
-
-  @ApiProperty({ description: 'ID do cliente na Shopify', required: false })
   shopifyId?: string;
-
-  @ApiProperty({ description: 'Tags do cliente', example: 'tag1,tag2', required: false })
-  tags?: string;
-
-  @ApiProperty({ description: 'Nota do cliente', example: 'Important customer', required: false })
+  createdAt?: Date;
+  updatedAt?: Date;
+  state?: string;
   note?: string;
-
-  @ApiProperty({ description: 'Taxa de isenção do cliente', example: false, required: false })
-  taxExempt?: boolean;
-
-  @ApiProperty({ description: 'Aceitação de marketing pelo cliente', example: true, required: false })
-  acceptsMarketing?: boolean;
-
-  @ApiProperty({ description: 'Identificador multipass do cliente', example: 'gid://shopify/Shop/123456789', required: false })
-  multipassIdentifier?: string;
-
-  @ApiProperty({ description: 'Contagem de pedidos do cliente', example: 0, required: false })
-  ordersCount?: number;
-
-  @ApiProperty({ description: 'Total gasto pelo cliente', example: '100.00', required: false })
-  totalSpent?: string;
-
-  @ApiProperty({ description: 'Nome do último pedido do cliente', example: '#1001', required: false })
+  verifiedEmail?: boolean;
+  tags?: string;
+  lastOrderId?: string;
   lastOrderName?: string;
-
-  @ApiProperty({ description: 'Data de criação do cliente', example: '2021-07-14T19:20:30+00:00', required: false })
-  createdAt?: string;
-
-  @ApiProperty({ description: 'Data da última atualização do cliente', example: '2021-07-14T19:20:30+00:00', required: false })
-  updatedAt?: string;
-
-  @ApiProperty({ description: 'Data do último pedido do cliente', example: '2021-07-14T19:20:30+00:00', required: false })
-  lastOrderDate?: string;
+  currency?: string;
+  acceptsMarketing?: boolean;
+  marketingOptInLevel?: string;
+  taxExempt?: boolean;
+  taxExemptions?: string[];
+  totalSpent?: string;
+  orderCount?: number;
+  multipassIdentifier?: string;
+  adminGraphqlApiId?: string;
+  defaultAddress?: AddressDto;
 }
 
-export class CreateCustomerDto extends CustomerDto {
-  @ApiProperty({ description: 'Senha do cliente', example: 'password123', required: false })
-  password?: string;
+//CreateCustomerDto 
+export class CreateCustomerDto {
+  customerId: string;
+  firstName: string; 
+  lastName: string; 
+  email: string; 
+  phone?: string; 
+  addresses?: AddressDto[]; 
+  verifiedEmail?: boolean; 
+  acceptsMarketing: boolean;
+} 
 
-  @ApiProperty({ description: 'Confirmação da senha do cliente', example: 'password123', required: false })
-  passwordConfirmation?: string;
+//validação do createcustomerdto em zod 
+export const validateCustomer = (data: any) => {
+  return customerSchemaZod.parse(data);
+};*/
 
-  @ApiProperty({ description: 'Estado do cliente', example: 'disabled', required: false })
-  state?: string;
+import { z } from 'zod';
+
+// Esquema Zod para Address
+export const addressSchemaZod = z.object({
+  address1: z.string().optional(),
+  address2: z.string().optional(),
+  city: z.string().optional(),
+  company: z.string().optional(),
+  country: z.string().optional(),
+  countryCode: z.string().optional(),
+  countryName: z.string().optional(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
+  province: z.string().optional(),
+  provinceCode: z.string().optional(),
+  zip: z.string().optional(),
+  default: z.boolean().optional(),
+});
+
+// Esquema Zod para Customer
+export const customerSchemaZod = z.object({
+  customerId: z.string().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  order: z.array(z.string()).optional(),
+  addresses: z.array(addressSchemaZod).optional(),
+  shopifyId: z.string().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  state: z.string().optional(),
+  note: z.string().optional(),
+  verifiedEmail: z.boolean().optional(),
+  tags: z.string().optional(),
+  lastOrderId: z.string().optional(),
+  lastOrderName: z.string().optional(),
+  currency: z.string().optional(),
+  acceptsMarketing: z.boolean().optional(),
+  marketingOptInLevel: z.string().optional(),
+  taxExempt: z.boolean().optional(),
+  taxExemptions: z.array(z.string()).optional(),
+  totalSpent: z.string().optional(),
+  orderCount: z.number().optional(),
+  multipassIdentifier: z.string().optional(),
+  adminGraphqlApiId: z.string().optional(),
+  defaultAddress: addressSchemaZod.optional(),
+});
+
+// Inferir tipos a partir do esquema Zod
+export type AddressDto = z.infer<typeof addressSchemaZod>;
+export type CustomerDto = z.infer<typeof customerSchemaZod>;
+
+// CreateCustomerDto - podemos simplificar se for necessário um DTO específico para criação
+export class CreateCustomerDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  addresses?: AddressDto[];
+  verifiedEmail?: boolean;
+  acceptsMarketing: boolean;
 }
 
-export class UpdateCustomerDto extends CustomerDto {
-
-  @ApiProperty({ description: 'Senha do cliente', example: 'newpassword123', required: false })
-  password?: string;
-
-  @ApiProperty({ description: 'Confirmação da senha do cliente', example: 'newpassword123', required: false })
-  passwordConfirmation?: string;
-
-  @ApiProperty({ description: 'Estado do cliente', example: 'disabled', required: false })
-  state?: string;
-}
+// Validação do CustomerDto em Zod
+export const validateCustomer = (data: any) => {
+  return customerSchemaZod.parse(data);
+};
