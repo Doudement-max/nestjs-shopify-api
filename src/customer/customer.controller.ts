@@ -21,7 +21,7 @@ export class CustomerController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obter todos os clientes' })
+  @ApiOperation({ summary: 'Obter todos os clientes pelo ID' })
   @ApiResponse({ status: 200, description: 'Lista de clientes', type: [validateCustomer] })
   async findAll(): Promise<CustomerDto[]> {
     return this.customerService.findAll();

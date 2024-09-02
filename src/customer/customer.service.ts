@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { CustomerModel } from './customer.model'; // Importa o modelo Mongoose
-import { validateCustomer } from './customer.model'; // Importa a validação Zod
+import { validateCustomer } from './dto/customer.dto'; 
 import { CustomerDto } from './dto/customer.dto';
 import { ShopifyService } from './shopify.customer.service';
 import { Model } from 'mongoose';
@@ -54,7 +54,7 @@ export class CustomerService {
     savedCustomer.shopifyId = shopifyCustomerId;
     await savedCustomer.save();
 
-    console.log(`Customer created: ${JSON.stringify(savedCustomer)}`);
+    console.log(`Customer created: with ID: ${savedCustomer._id}`);
     return savedCustomer;
   }
 
