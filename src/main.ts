@@ -16,9 +16,10 @@ async function bootstrap() {
     .addTag('Order') 
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
- app.useGlobalPipes( new ZodValidationPipe(createOrderSchema))
-  await app.listen(3000);
+  SwaggerModule.setup('docs', app, document); 
+  app.useGlobalPipes( new ValidationPipe(({transform: true})),
+  //app.useGlobalPipes( new ZodValidationPipe({createOrderSchema}))
+  await app.listen(3000));
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

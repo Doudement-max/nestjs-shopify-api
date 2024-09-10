@@ -9,14 +9,12 @@ import { FulfillmentDto } from './dto/fulfillment.dto';
 import { TransactionDto } from './dto/transaction.dto';
 import { OrderCancelDto } from './dto/cancel.order.dto';
 import { ProductService } from 'src/product/product.service';
-import { CustomerService } from 'src/customer/customer.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(orderModel.name) private readonly orderModel: Model<any>,
     @Inject(forwardRef(() => ProductService)) private readonly productService: ProductService,
-    @Inject(forwardRef(() => CustomerService)) private readonly customerService: CustomerService,
   ) {}
 
   async findAll(): Promise<ResponseOrderDto[]> {
@@ -35,40 +33,21 @@ export class OrderService {
     return order as ResponseOrderDto;
   }
 
-  async findOrderByCustomerId(customerId: string): Promise<ResponseOrderDto[]> {
-    const order = await this.orderModel.find({ customerId }).exec();
-    console.log(`Pedido para Cliente ID ${customerId} recuperada: ${JSON.stringify(order)}`);
-    return order.map(order => order as ResponseOrderDto);
-  }
+  // Removendo o método findOrderByCustomerId porque depende do CustomerService
 
   async create(createOrderDto: CreateOrderSchemaType): Promise<ResponseOrderDto> {
-    const { productId, customerId, quantity } = createOrderDto;
+    const { productId, quantity } = createOrderDto;
 
+    // Validando o produto
     const product = await this.productService.findOne(productId);
     if (!product) {
       console.log(`Product with ID ${productId} not found`);
       throw new NotFoundException('Produto não encontrado');
     }
 
-    const customer = await this.customerService.findOne(customerId);
-    if (!customer) {
-      console.log(`Customer with ID ${customerId} not found`);
-      throw new NotFoundException('Cliente não encontrado');
-    }
-
+    // Criando o pedido
     const newOrder = new this.orderModel(createOrderDto);
     const savedOrder = await newOrder.save();
-
-    customer.order.push(savedOrder._id.toString());
-    await this.customerService.update(customerId, {
-      order: customer.order,
-      customerId: customer.customerId,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phone: customer.phone,
-      addresses: customer.addresses || [],
-    });
 
     console.log(`Order created: ${JSON.stringify(savedOrder)}`);
     return savedOrder as ResponseOrderDto;

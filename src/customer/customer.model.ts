@@ -23,7 +23,6 @@ export const customerMongooseSchema = new Schema({
     zip: String,
     default: Boolean,
   }],
-  shopifyId: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   state: { type: String },

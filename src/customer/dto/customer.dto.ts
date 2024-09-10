@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { z } from 'zod';
+import { LineItemDto } from 'src/order/dto/lineitem.dto';
+import { date, z } from 'zod';
+import { IsDate, IsEmail } from 'class-validator';
 
 // Esquema Zod para Address
 export const addressSchemaZod = z.object({
@@ -18,185 +20,118 @@ export const addressSchemaZod = z.object({
   default: z.boolean().optional(),
 });
 
-// Transformar AddressDto em uma classe para ser usada em tempo de execução
-export class AddressDto {
-  @ApiProperty({ description: 'Primeira linha do endereço', required: false })
-  address1?: string;
-
-  @ApiProperty({ description: 'Segunda linha do endereço', required: false })
-  address2?: string;
-
-  @ApiProperty({ description: 'Cidade', required: false })
-  city?: string;
-
-  @ApiProperty({ description: 'Nome da empresa', required: false })
-  company?: string;
-
-  @ApiProperty({ description: 'País', required: false })
-  country?: string;
-
-  @ApiProperty({ description: 'Código do país', required: false })
-  countryCode?: string;
-
-  @ApiProperty({ description: 'Nome do país', required: false })
-  countryName?: string;
-
-  @ApiProperty({ description: 'Nome', required: false })
-  name?: string;
-
-  @ApiProperty({ description: 'Número de telefone', required: false })
-  phone?: string;
-
-  @ApiProperty({ description: 'Província', required: false })
-  province?: string;
-
-  @ApiProperty({ description: 'Código da província', required: false })
-  provinceCode?: string;
-
-  @ApiProperty({ description: 'Código postal', required: false })
-  zip?: string;
-
-  @ApiProperty({ description: 'É o endereço padrão?', required: false })
-  default?: boolean;
-}
-
-// Esquema Zod para Customer
-export const customerSchemaZod = z.object({
-  customerId: z.string().optional(),
+export const createCustomerSchemaZod = z.object({
+  customerId: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
   phone: z.string().optional(),
-  order: z.array(z.string()).optional(),
+  verified_email: z.boolean().optional(),
   addresses: z.array(addressSchemaZod).optional(),
-  shopifyId: z.string().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-  state: z.string().optional(),
-  note: z.string().optional(),
   verifiedEmail: z.boolean().optional(),
-  tags: z.string().optional(),
-  lastOrderId: z.string().optional(),
-  lastOrderName: z.string().optional(),
-  currency: z.string().optional(),
-  acceptsMarketing: z.boolean().optional(),
-  marketingOptInLevel: z.string().optional(),
-  taxExempt: z.boolean().optional(),
-  taxExemptions: z.array(z.string()).optional(),
-  totalSpent: z.string().optional(),
-  orderCount: z.number().optional(),
-  multipassIdentifier: z.string().optional(),
-  adminGraphqlApiId: z.string().optional(),
-  defaultAddress: addressSchemaZod.optional(),
+  acceptsMarketing: z.boolean(),
+  data: z.string().transform((val) => new Date(val)), // Simplesmente validando como Date no Zod
 });
 
-// Inferir tipos a partir do esquema Zod
-export type AddressDtoType = z.infer<typeof addressSchemaZod>;
+// Classe AddressDto
+export class AddressDto {
+  @ApiProperty({ description: 'Primeira linha do endereço', required: true })
+  address1?: string;
 
-export class CustomerDto {
-  @ApiProperty({ description: 'Identificador único para o cliente' })
-  customerId: string;
+  @ApiProperty({ description: 'Segunda linha do endereço', required: true })
+  address2?: string;
 
-  @ApiProperty({ description: 'Primeiro nome do cliente' })
-  firstName: string;
+  @ApiProperty({ description: 'Cidade', required: true })
+  city?: string;
 
-  @ApiProperty({ description: 'Último nome do cliente' })
-  lastName: string;
+  @ApiProperty({ description: 'Nome da empresa', required: true })
+  company?: string;
 
-  @ApiProperty({ description: 'Endereço de email do cliente' })
-  email: string;
+  @ApiProperty({ description: 'País', required: true })
+  country?: string;
 
-  @ApiProperty({ description: 'Número de telefone do cliente', required: false })
+  @ApiProperty({ description: 'Código do país', required: true })
+  countryCode?: string;
+
+  @ApiProperty({ description: 'Nome do país', required: true })
+  countryName?: string;
+
+  @ApiProperty({ description: 'Nome', required: true })
+  name?: string;
+
+  @ApiProperty({ description: 'Número de telefone', required: true })
   phone?: string;
 
-  @ApiProperty({ description: 'Lista de endereços do cliente', type: [AddressDto], required: false })
-  addresses?: AddressDto[];
+  @ApiProperty({ description: 'Província', required: true })
+  province?: string;
 
-  @ApiProperty({ description: 'Lista de IDs de pedidos associados ao cliente', required: false })
-  order?: string[];
+  @ApiProperty({ description: 'Código da província', required: true })
+  provinceCode?: string;
 
-  @ApiProperty({ description: 'ID do cliente no Shopify', required: false })
-  shopifyId?: string;
+  @ApiProperty({ description: 'Código postal', required: true })
+  zip?: string;
 
-  @ApiProperty({ description: 'Data de criação do cliente', required: false })
-  createdAt?: Date;
-
-  @ApiProperty({ description: 'Data da última atualização do cliente', required: false })
-  updatedAt?: Date;
-
-  @ApiProperty({ description: 'Estado do cliente', required: false })
-  state?: string;
-
-  @ApiProperty({ description: 'Notas sobre o cliente', required: false })
-  note?: string;
-
-  @ApiProperty({ description: 'O email foi verificado?', required: false })
-  verifiedEmail?: boolean;
-
-  @ApiProperty({ description: 'Tags associadas ao cliente', required: false })
-  tags?: string;
-
-  @ApiProperty({ description: 'ID do último pedido associado ao cliente', required: false })
-  lastOrderId?: string;
-
-  @ApiProperty({ description: 'Nome do último pedido associado ao cliente', required: false })
-  lastOrderName?: string;
-
-  @ApiProperty({ description: 'Moeda usada pelo cliente', required: false })
-  currency?: string;
-
-  @ApiProperty({ description: 'O cliente aceita marketing?', required: false })
-  acceptsMarketing?: boolean;
-
-  @ApiProperty({ description: 'Nível de opt-in de marketing do cliente', required: false })
-  marketingOptInLevel?: string;
-
-  @ApiProperty({ description: 'O cliente está isento de impostos?', required: false })
-  taxExempt?: boolean;
-
-  @ApiProperty({ description: 'Isenções fiscais do cliente', required: false })
-  taxExemptions?: string[];
-
-  @ApiProperty({ description: 'Total gasto pelo cliente', required: false })
-  totalSpent?: string;
-
-  @ApiProperty({ description: 'Total de pedidos feitos pelo cliente', required: false })
-  orderCount?: number;
-
-  @ApiProperty({ description: 'Identificador Multipass do cliente', required: false })
-  multipassIdentifier?: string;
-
-  @ApiProperty({ description: 'ID da API GraphQL do administrador do cliente', required: false })
-  adminGraphqlApiId?: string;
-
-  @ApiProperty({ description: 'Endereço padrão do cliente', type: AddressDto, required: false })
-  defaultAddress?: AddressDto;
+  @ApiProperty({ description: 'É o endereço padrão?', required: true })
+  default?: boolean;
 }
 
+// Classe CreateCustomerDto
 export class CreateCustomerDto {
+  @ApiProperty({ description: 'Cliente', required: true })
+  customer: string;
+
+  @ApiProperty({ description: 'Itens do cliente', required: true })
+  items: string[];
+
+  @ApiProperty({ description: 'Id do cliente' })
+  customerId: string;
+
+  @ApiProperty({ description: 'Total', required: true })
+  total: number;
+
+  @ApiProperty({ description: 'Itens de linha', type: [LineItemDto], required: false })
+  line_items: LineItemDto[];
+
+  @ApiProperty({ description: 'Taxa total', required: true })
+  totalTax: string;
+
+  @ApiProperty({ description: 'Moeda', required: true })
+  currency: string;
+
+  @ApiProperty({ description: 'Id', required: true })
+  id: number;
+
   @ApiProperty({ description: 'Primeiro nome do cliente' })
   firstName: string;
 
   @ApiProperty({ description: 'Último nome do cliente' })
   lastName: string;
 
-  @ApiProperty({ description: 'Endereço de Email do Cliente' })
+  @ApiProperty({ description: 'Endereço de email do cliente', required: true })
+  @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'Número de telefone', required: false })
+  @ApiProperty({ description: 'Id do produto', required: true })
+  productId: string;
+
+  @ApiProperty({ description: 'Número de telefone', required: true })
   phone?: string;
+
+  @IsDate()
+  @ApiProperty({ description: 'Data', required: true, type: Date, format: 'date-time' })
+  data: Date;
 
   @ApiProperty({ description: 'Lista de endereços do cliente', type: [AddressDto], required: false })
   addresses?: AddressDto[];
 
-  @ApiProperty({ description: 'Verificar o email', required: false })
-  verifiedEmail?: boolean;
+  @ApiProperty({ description: 'Verificar o email', required: true })
+  verifiedEmail: boolean;
 
   @ApiProperty({ description: 'Solicitação de marketing' })
   acceptsMarketing: boolean;
 }
 
-// Validação do CustomerDto em Zod
+// Função de validação utilizando Zod
 export const validateCustomer = (data: any) => {
-  return customerSchemaZod.parse(data);
+  return createCustomerSchemaZod.parse(data);
 };

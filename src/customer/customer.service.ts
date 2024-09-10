@@ -1,103 +1,108 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CustomerModel } from './customer.model'; // Importa o modelo Mongoose
 import { validateCustomer } from './dto/customer.dto'; 
-import { CustomerDto } from './dto/customer.dto';
-import { ShopifyService } from './shopify.customer.service';
+import { CreateCustomerDto } from './dto/customer.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class CustomerService {
+  private readonly logger = new Logger(CustomerService.name);
+
   constructor(
-    private readonly shopifyService: ShopifyService,
-    // Injetando o modelo Mongoose
-    @InjectModel('Customer') private readonly customerModel: Model<CustomerDto>,
+    @InjectModel('Customer') private readonly customerModel: Model<CreateCustomerDto>,
   ) {}
 
-  async findAll(): Promise<CustomerDto[]> {
-    const customers = await this.customerModel.find().exec();
-    console.log(`Customer retrieved: ${JSON.stringify(customers)}`);
-    return customers;
-  }
-
-  async findOne(id: string): Promise<CustomerDto> {
-    const customer = await this.customerModel.findById(id).exec();
-    if (!customer) {
-      console.log(`Customer with ID ${id} not found`);
-      throw new NotFoundException('Customer not found');
-    }
-    console.log(`Customer retrieved: ${JSON.stringify(customer)}`);
-    return customer;
-  }
-
-  async create(customerDto: CustomerDto): Promise<CustomerDto> {
-    // Validação com Zod
+  async findAll(): Promise<CreateCustomerDto[]> {
     try {
-      validateCustomer(customerDto); // Valida o DTO usando Zod
+      this.logger.log('Buscando todos os clientes...');
+      const customers = await this.customerModel.find().exec();
+      this.logger.log(`Clientes recuperados: ${JSON.stringify(customers)}`);
+      return customers;
     } catch (error) {
-      console.error(`Validation error: ${error}`);
-      throw new BadRequestException('Invalid customer data');
+      this.logger.error(`Failed to fetch customers: ${error.message}`);
+      throw new InternalServerErrorException('Failed to retrieve customers');
     }
-
-    const newCustomer = new this.customerModel(customerDto);
-    const savedCustomer = await newCustomer.save();
-
-    // Simulando a criação de um cliente no Shopify
-    const shopifyCustomerId = await this.shopifyService.createCustomer({
-      first_name: customerDto.firstName,
-      last_name: customerDto.lastName,
-      email: customerDto.email,
-      phone: customerDto.phone,
-      tags: customerDto.order?.join(','),
-    });
-
-    savedCustomer.shopifyId = shopifyCustomerId;
-    await savedCustomer.save();
-
-    console.log(`Customer created: with ID: ${savedCustomer._id}`);
-    return savedCustomer;
   }
 
-  async update(id: string, customerDto: CustomerDto): Promise<CustomerDto> {
-    // Validação com Zod
+  async findOne(id: string): Promise<CreateCustomerDto> {
     try {
-      validateCustomer(customerDto); // Valida o DTO usando Zod
+      this.logger.log(`Falha ao buscar clientes: ${id}`);
+      const customer = await this.customerModel.findById(id).exec();
+      if (!customer) {
+        this.logger.warn(`Cliente com ID ${id} não encontrado`);
+        throw new NotFoundException('Cliente não encontrado');
+      }
+      this.logger.log(`Cliente recuperado: ${JSON.stringify(customer)}`);
+      return customer;
     } catch (error) {
-      console.error(`Validation error: ${error}`);
-      throw new BadRequestException('Invalid customer data');
+      this.logger.error(`Falha ao buscar cliente com ID ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Falha ao buscar cliente com ID');
     }
-
-    const updatedCustomer = await this.customerModel.findByIdAndUpdate(id, customerDto, { new: true }).exec();
-    if (!updatedCustomer) {
-      console.log(`Customer with ID ${id} not found`);
-      throw new NotFoundException('Customer not found');
-    }
-
-    await this.shopifyService.updateCustomer(updatedCustomer.shopifyId, {
-      first_name: customerDto.firstName,
-      last_name: customerDto.lastName,
-      email: customerDto.email,
-      phone: customerDto.phone,
-      tags: customerDto.order?.join(','),
-    });
-
-    console.log(`Customer updated: ${JSON.stringify(updatedCustomer)}`);
-    return updatedCustomer;
   }
 
-  async remove(id: string): Promise<CustomerDto> {
-    const deletedCustomer = await this.customerModel.findByIdAndDelete(id).exec();
-    if (!deletedCustomer) {
-      throw new NotFoundException('Customer not found');
+  async create(createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
+    this.logger.log('Validando dados do cliente...');
+    try {
+      validateCustomer(createCustomerDto);
+      this.logger.log('Dados do Cliente validados com sucesso!');
+    } catch (error) {
+      this.logger.error(`Erro na validação: ${error.message}`);
+      throw new BadRequestException('Dados do cliente inválidos');
     }
 
     try {
-      await this.shopifyService.deleteCustomer(deletedCustomer.shopifyId);
+      this.logger.log('Salvando novo cliente no banco de dados...');
+      const newCustomer = new this.customerModel(createCustomerDto);
+      const savedCustomer = await newCustomer.save();
+
+      this.logger.log(`Cliente criado com sucesso com ID: ${savedCustomer._id}`);
+      return savedCustomer;
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting customer in Shopify');
+      this.logger.error(`Failed to create customer: ${error.message}`);
+      throw new InternalServerErrorException('Failed to create customer');
+    }
+  }
+
+  async update(id: string, createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
+    this.logger.log(`Atualizando cliente com ID: ${id}`);
+    try {
+      validateCustomer(createCustomerDto);
+      this.logger.log('Dados do cliente validados com sucesso!');
+    } catch (error) {
+      this.logger.error(`Erro de validação: ${error.message}`);
+      throw new BadRequestException('Dados do cliente inválidos');
     }
 
-    console.log(`Customer removed: ${JSON.stringify(deletedCustomer)}`);
-    return deletedCustomer;
+    try {
+      const updatedCustomer = await this.customerModel.findByIdAndUpdate(id, createCustomerDto, { new: true }).exec();
+      if (!updatedCustomer) {
+        this.logger.warn(`Cliente com ID ${id} não encontrado`);
+        throw new NotFoundException('Cliente não encontrado');
+      }
+
+      this.logger.log(`Cliente atualizado com sucesso: ${JSON.stringify(updatedCustomer)}`);
+      return updatedCustomer;
+    } catch (error) {
+      this.logger.error(`Falha ao atualizar cliente com ID ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Falha ao atualizar cliente');
+    }
+  }
+
+  async remove(id: string): Promise<CreateCustomerDto> {
+    this.logger.log(`Removendo cliente com ID: ${id}`);
+    try {
+      const deletedCustomer = await this.customerModel.findByIdAndDelete(id).exec();
+      if (!deletedCustomer) {
+        this.logger.warn(`Cliente com ID ${id} não encontrado`);
+        throw new NotFoundException('Cliente não encontrado');
+      }
+
+      this.logger.log(`Cliente removido com sucesso: ${JSON.stringify(deletedCustomer)}`);
+      return deletedCustomer;
+    } catch (error) {
+      this.logger.error(`Falha ao remover cliente com ID ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Falha ao remover cliente');
+    }
   }
 }
