@@ -24,13 +24,13 @@ export const createCustomerSchemaZod = z.object({
   customerId: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  email: z.string().email(),
+  email: z.string().email().optional(),
   phone: z.string().optional(),
   verified_email: z.boolean().optional(),
   addresses: z.array(addressSchemaZod).optional(),
   verifiedEmail: z.boolean().optional(),
   acceptsMarketing: z.boolean(),
-  data: z.string().transform((val) => new Date(val)), // Simplesmente validando como Date no Zod
+  data: z.union([z.string(), z.date()]), // Simplesmente validando como Date no Zod
 });
 
 // Classe AddressDto
@@ -107,7 +107,7 @@ export class CreateCustomerDto {
   @ApiProperty({ description: 'Último nome do cliente' })
   lastName: string;
 
-  @ApiProperty({ description: 'Endereço de email do cliente', required: true })
+  @ApiProperty({ description: 'Endereço de email do cliente', required: true, format: 'email', example: 'user@exemplo.com'})
   @IsEmail()
   email: string;
 
