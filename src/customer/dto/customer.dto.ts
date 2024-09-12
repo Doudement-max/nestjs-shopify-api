@@ -35,99 +35,99 @@ export const createCustomerSchemaZod = z.object({
 
 // Classe AddressDto
 export class AddressDto {
-  @ApiProperty({ description: 'Primeira linha do endereço', required: true })
+  @ApiProperty({ description: 'First line of address', required: true })
   address1?: string;
 
-  @ApiProperty({ description: 'Segunda linha do endereço', required: true })
+  @ApiProperty({ description: 'Second line of address', required: true })
   address2?: string;
 
-  @ApiProperty({ description: 'Cidade', required: true })
+  @ApiProperty({ description: 'City', required: true })
   city?: string;
 
-  @ApiProperty({ description: 'Nome da empresa', required: true })
+  @ApiProperty({ description: 'Company name', required: true })
   company?: string;
 
-  @ApiProperty({ description: 'País', required: true })
+  @ApiProperty({ description: 'Country', required: true })
   country?: string;
 
-  @ApiProperty({ description: 'Código do país', required: true })
+  @ApiProperty({ description: 'Country code', required: true })
   countryCode?: string;
 
-  @ApiProperty({ description: 'Nome do país', required: true })
+  @ApiProperty({ description: 'Country name', required: true })
   countryName?: string;
 
-  @ApiProperty({ description: 'Nome', required: true })
+  @ApiProperty({ description: 'Name', required: true })
   name?: string;
 
-  @ApiProperty({ description: 'Número de telefone', required: true })
+  @ApiProperty({ description: 'Phone number', required: true })
   phone?: string;
 
-  @ApiProperty({ description: 'Província', required: true })
+  @ApiProperty({ description: 'Province', required: true })
   province?: string;
 
-  @ApiProperty({ description: 'Código da província', required: true })
+  @ApiProperty({ description: 'Province code', required: true })
   provinceCode?: string;
 
-  @ApiProperty({ description: 'Código postal', required: true })
+  @ApiProperty({ description: 'Zip code', required: true })
   zip?: string;
 
-  @ApiProperty({ description: 'É o endereço padrão?', required: true })
+  @ApiProperty({ description: 'Is it the default address?', required: true })
   default?: boolean;
 }
 
 // Classe CreateCustomerDto
 export class CreateCustomerDto {
-  @ApiProperty({ description: 'Cliente', required: true })
+  @ApiProperty({ description: 'Customer', required: true })
   customer: string;
 
-  @ApiProperty({ description: 'Itens do cliente', required: true })
+  @ApiProperty({ description: 'Customer Items', required: true })
   items: string[];
 
-  @ApiProperty({ description: 'Id do cliente' })
+  @ApiProperty({ description: 'client id' })
   customerId: string;
 
   @ApiProperty({ description: 'Total', required: true })
   total: number;
 
-  @ApiProperty({ description: 'Itens de linha', type: [LineItemDto], required: false })
+  @ApiProperty({ description: 'Line Items', type: [LineItemDto], required: false })
   line_items: LineItemDto[];
 
-  @ApiProperty({ description: 'Taxa total', required: true })
+  @ApiProperty({ description: 'Total Tax', required: true })
   totalTax: string;
 
-  @ApiProperty({ description: 'Moeda', required: true })
+  @ApiProperty({ description: 'Currency', required: true })
   currency: string;
 
   @ApiProperty({ description: 'Id', required: true })
   id: number;
 
-  @ApiProperty({ description: 'Primeiro nome do cliente' })
+  @ApiProperty({ description: 'First Name' })
   firstName: string;
 
-  @ApiProperty({ description: 'Último nome do cliente' })
+  @ApiProperty({ description: 'Last Name' })
   lastName: string;
 
-  @ApiProperty({ description: 'Endereço de email do cliente', required: true, format: 'email', example: 'user@exemplo.com'})
+  @ApiProperty({ description: 'Customer email address', required: true, format: 'email', example: 'user@exemplo.com'})
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'Id do produto', required: true })
+  @ApiProperty({ description: 'Product Id', required: true })
   productId: string;
 
-  @ApiProperty({ description: 'Número de telefone', required: true })
+  @ApiProperty({ description: 'Phone', required: true })
   phone?: string;
 
   @IsDate()
   @ApiProperty({ description: 'Data', required: true, type: Date, format: 'date-time' })
   data: Date;
 
-  @ApiProperty({ description: 'Lista de endereços do cliente', type: [AddressDto], required: false })
+  @ApiProperty({ description: 'Customer address list', type: [AddressDto], required: false })
   addresses?: AddressDto[];
 
-  @ApiProperty({ description: 'Verificar o email', required: true })
+  @ApiProperty({ description: 'Check email', required: true })
   verifiedEmail: boolean;
 
-  @ApiProperty({ description: 'Solicitação de marketing' })
+  @ApiProperty({ description: 'Accepts Marketing' })
   acceptsMarketing: boolean;
 }
 

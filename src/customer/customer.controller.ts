@@ -11,78 +11,78 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar um novo cliente' })
-  @ApiResponse({ status: 201, description: 'Cliente criado com sucesso', type: CreateCustomerDto })
+  @ApiOperation({ summary: 'Create a new customer' })
+  @ApiResponse({ status: 201, description: 'Client created successfully', type: CreateCustomerDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @UsePipes(new ZodValidationPipe(createCustomerSchemaZod)) // Aplicar validação Zod
   async create(@Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
-    this.logger.log(`Recebendo dados para criar o cliente: ${JSON.stringify(createCustomerDto)}`);
+    this.logger.log(`Receiving data to create the client: ${JSON.stringify(createCustomerDto)}`);
     try {
       const result = await this.customerService.create(createCustomerDto);
-      this.logger.log(`Cliente criado com sucesso: ${JSON.stringify(result)}`);
+      this.logger.log(`Client created successfully: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.logger.error(`Erro ao criar cliente: ${error.message}`);
+      this.logger.error(`Error creating client: ${error.message}`);
       throw error;
     }
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obter todos os clientes' })
-  @ApiResponse({ status: 200, description: 'Lista de clientes', type: [CreateCustomerDto] })
+  @ApiOperation({ summary: 'Get all customers' })
+  @ApiResponse({ status: 200, description: 'Customer list', type: [CreateCustomerDto] })
   async findAll(): Promise<CreateCustomerDto[]> {
-    this.logger.log('Obtendo todos os clientes');
+    this.logger.log('Get all customers');
     try {
       const result = await this.customerService.findAll();
-      this.logger.log(`Clientes obtidos com sucesso: ${JSON.stringify(result)}`);
+      this.logger.log(`Successfully Obtained Clients: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.logger.error(`Erro ao obter clientes: ${error.message}`);
+      this.logger.error(`Error getting customers: ${error.message}`);
       throw error;
     }
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obter um cliente pelo ID' })
-  @ApiResponse({ status: 200, description: 'Dados do cliente', type: CreateCustomerDto })
+  @ApiOperation({ summary: 'Get a customer by ID' })
+  @ApiResponse({ status: 200, description: 'Customer data', type: CreateCustomerDto })
   async findOne(@Param('id') id: string): Promise<CreateCustomerDto> {
-    this.logger.log(`Obtendo cliente pelo ID: ${id}`);
+    this.logger.log(`Getting customer by ID: ${id}`);
     try {
       const result = await this.customerService.findOne(id);
-      this.logger.log(`Cliente obtido com sucesso: ${JSON.stringify(result)}`);
+      this.logger.log(`Client successfully obtained: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.logger.error(`Erro ao obter cliente com ID ${id}: ${error.message}`);
+      this.logger.error(`Error getting customer ID ${id}: ${error.message}`);
       throw error;
     }
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar um cliente pelo ID' })
-  @ApiResponse({ status: 200, description: 'Cliente atualizado com sucesso', type: CreateCustomerDto })
+  @ApiOperation({ summary: 'Update a customer by ID' })
+  @ApiResponse({ status: 200, description: 'Client updated successfully', type: CreateCustomerDto })
   async update(@Param('id') id: string, @Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
-    this.logger.log(`Atualizando cliente com ID ${id}`);
+    this.logger.log(`Updating client with ID ${id}`);
     try {
       const result = await this.customerService.update(id, createCustomerDto);
-      this.logger.log(`Cliente atualizado com sucesso: ${JSON.stringify(result)}`);
+      this.logger.log(`Client updated successfully: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.logger.error(`Erro ao atualizar cliente com ID ${id}: ${error.message}`);
+      this.logger.error(`Error updating client with ID${id}: ${error.message}`);
       throw error;
     }
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remover um cliente pelo ID' })
-  @ApiResponse({ status: 200, description: 'Cliente removido com sucesso', type: CreateCustomerDto })
+  @ApiOperation({ summary: 'Remove a customer by ID' })
+  @ApiResponse({ status: 200, description: 'Client removed successfully', type: CreateCustomerDto })
   async remove(@Param('id') id: string): Promise<CreateCustomerDto> {
-    this.logger.log(`Removendo cliente com ID ${id}`);
+    this.logger.log(`Removing client with ID ${id}`);
     try {
       const result = await this.customerService.remove(id);
-      this.logger.log(`Cliente removido com sucesso: ${JSON.stringify(result)}`);
+      this.logger.log(`Client removed successfully: ${JSON.stringify(result)}`);
       return result;
     } catch (error) {
-      this.logger.error(`Erro ao remover cliente com ID ${id}: ${error.message}`);
+      this.logger.error(`Error removing customer with ID${id}: ${error.message}`);
       throw error;
     }
   }
