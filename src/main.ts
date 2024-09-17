@@ -15,9 +15,10 @@ async function bootstrap() {
     .addTag('Product')
     .addTag('Order') 
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+ 
+const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document); 
-  //app.useGlobalPipes( new ValidationPipe(({transform: true})),
+ 
   
   await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);

@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+/*import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CustomerService } from './customer.service';
 import { CustomerController } from './customer.controller';
@@ -11,7 +11,7 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Customer', schema: customerMongooseSchema }]), 
+    MongooseModule.forFeature([{ name: 'CustomerModel.name', schema: customerMongooseSchema }]), 
     forwardRef(() => OrderModule),
     forwardRef(() => ProductModule),
     ConfigModule,
@@ -20,5 +20,22 @@ import { HttpModule } from '@nestjs/axios';
   controllers: [CustomerController],
   providers: [CustomerService, ShopifyService],
   exports: [CustomerService]
+})
+export class CustomerModule {}*/ 
+
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CustomerService } from './customer.service';
+import { CustomerController } from './customer.controller';
+import { CustomerModel, customerMongooseSchema } from './customer.model';
+
+@Module({
+  imports: [
+    
+    MongooseModule.forFeature([{ name: CustomerModel.name, schema: customerMongooseSchema }])
+  ],
+  providers: [CustomerService],
+  controllers: [CustomerController],
+  exports: [CustomerService], 
 })
 export class CustomerModule {}

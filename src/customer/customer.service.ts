@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
-import { CustomerModel } from './customer.model'; // Importa o modelo Mongoose
+import { CustomerModel } from './customer.model'; // Import the Mongoose model
 import { validateCustomer } from './dto/customer.dto'; 
 import { CreateCustomerDto } from './dto/customer.dto';
 import { Model } from 'mongoose';
@@ -10,15 +10,15 @@ export class CustomerService {
   private readonly logger = new Logger(CustomerService.name);
 
   constructor(
-    @InjectModel('Customer') private readonly customerModel: Model<CreateCustomerDto>,
+    @InjectModel(CustomerModel.name) private readonly customerModel: Model<CreateCustomerDto>,
   ) {}
 
   async findAll(): Promise<CreateCustomerDto[]> {
     try {
       this.logger.log('Searching all customers...');
-      const customers = await this.customerModel.find().exec();
-      this.logger.log(`Recovered customers: ${JSON.stringify(customers)}`);
-      return customers;
+      const customerModel = await this.customerModel.find().exec();
+      this.logger.log(`Recovered customers: ${JSON.stringify(customerModel)}`);
+      return customerModel;
     } catch (error) {
       this.logger.error(`Failed to fetch customers: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve customers');
@@ -27,7 +27,7 @@ export class CustomerService {
 
   async findOne(id: string): Promise<CreateCustomerDto> {
     try {
-      this.logger.log(`Failed to fetch customers: ${id}`);
+      this.logger.log(`Fetching customer by ID: ${id}`);
       const customer = await this.customerModel.findById(id).exec();
       if (!customer) {
         this.logger.warn(`Customer with ID ${id} not found`);
@@ -44,23 +44,20 @@ export class CustomerService {
   async create(createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log('Validating customer data...');
     try {
-      validateCustomer(createCustomerDto);
+      validateCustomer(createCustomerDto); 
       this.logger.log('Customer data successfully validated!');
+      
+      const newCustomer = new this.customerModel(createCustomerDto); 
+      const savedCustomer = await newCustomer.save(); 
+
+      savedCustomer.customerId = savedCustomer._id.toHexString(); 
+      await savedCustomer.save(); 
+
+      this.logger.log(`Customer created with ID: ${savedCustomer.customerId}`); 
+      return savedCustomer; 
     } catch (error) {
       this.logger.error(`Validation error: ${error.message}`);
       throw new BadRequestException('Invalid customer data');
-    }
-
-    try {
-      this.logger.log('Saving new customer to database...');
-      const newCustomer = new this.customerModel(createCustomerDto);
-      const savedCustomer = await newCustomer.save();
-
-      this.logger.log(`Client created successfully with ID: ${savedCustomer._id}`);
-      return savedCustomer;
-    } catch (error) {
-      this.logger.error(`Failed to create customer: ${error.message}`);
-      throw new InternalServerErrorException('Failed to create customer');
     }
   }
 

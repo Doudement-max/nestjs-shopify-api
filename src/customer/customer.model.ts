@@ -58,4 +58,4 @@ export const customerMongooseSchema = new Schema({
 });
 
 // Exportando o modelo Mongoose
-export const CustomerModel = model('Customer', customerMongooseSchema);
+export const CustomerModel = model('CustomerModel', customerMongooseSchema);
