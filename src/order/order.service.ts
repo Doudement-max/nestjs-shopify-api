@@ -19,7 +19,7 @@ export class OrderService {
 
   async findAll(): Promise<ResponseOrderDto[]> {
     const order = await this.orderModel.find().exec();
-    console.log(`Pedido Recuperado: ${JSON.stringify(order)}`);
+    console.log(`Request Recovered: ${JSON.stringify(order)}`);
     return order.map(order => order as ResponseOrderDto);
   }
 
@@ -42,7 +42,7 @@ export class OrderService {
     const product = await this.productService.findOne(productId);
     if (!product) {
       console.log(`Product with ID ${productId} not found`);
-      throw new NotFoundException('Produto não encontrado');
+      throw new NotFoundException('Product not found');
     }
 
     // Criando o pedido
@@ -57,7 +57,7 @@ export class OrderService {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, order, { new: true }).exec();
     if (!updatedOrder) {
       console.log(`Order with ID ${id} not found`);
-      throw new NotFoundException('Pedido não encontrado');
+      throw new NotFoundException('Request not found');
     }
     console.log(`Order updated: ${JSON.stringify(updatedOrder)}`);
     return updatedOrder as ResponseOrderDto;
@@ -67,7 +67,7 @@ export class OrderService {
     const deletedOrder = await this.orderModel.findByIdAndDelete(id).exec();
     if (!deletedOrder) {
       console.log(`Order with ID ${id} not found`);
-      throw new NotFoundException('Pedido não encontrado');
+      throw new NotFoundException('Request not found');
     }
     console.log(`Order removed: ${JSON.stringify(deletedOrder)}`);
     return deletedOrder as ResponseOrderDto;
@@ -89,7 +89,7 @@ export class OrderService {
     const updatedOrder = await this.orderModel.findByIdAndUpdate(id, { status: 'cancelled', cancelDetails }, { new: true }).exec();
     if (!updatedOrder) {
       console.log(`Order with ID ${id} not found`);
-      throw new NotFoundException('Pedido não encontrado');
+      throw new NotFoundException('Request not found');
     }
     console.log(`Order ID ${id} cancelled: ${JSON.stringify(cancelDetails)}`);
     return updatedOrder as ResponseOrderDto;

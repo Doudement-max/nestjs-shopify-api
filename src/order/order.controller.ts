@@ -15,57 +15,57 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obter todos os pedidos' })
-  @ApiResponse({ status: 200, description: 'Lista de pedidos', type: [ResponseOrderDto] })
+  @ApiOperation({ summary: 'Get all order' })
+  @ApiResponse({ status: 200, description: 'Order list', type: [ResponseOrderDto] })
   async findAll(): Promise<ResponseOrderDto[]> {
     return this.orderService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obter um pedido pelo ID' })
-  @ApiResponse({ status: 200, description: 'Dados do pedido', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Get an order by ID' })
+  @ApiResponse({ status: 200, description: 'Order data', type: ResponseOrderDto })
   async findOne(@Param('id') id: string): Promise<ResponseOrderDto> {
     return this.orderService.findOne(id);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Criar um novo pedido' })
-  @ApiResponse({ status: 201, description: 'Pedido criado com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({ status: 201, description: 'Request created successfully', type: ResponseOrderDto })
   async create(@Body() createOrderDto: CreateOrderDto): Promise<ResponseOrderDto> {
     return this.orderService.create(createOrderDto);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar um pedido pelo ID' })
-  @ApiResponse({ status: 200, description: 'Pedido atualizado com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Update an order by ID' })
+  @ApiResponse({ status: 200, description: 'Request updated successfully', type: ResponseOrderDto })
   async update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto): Promise<ResponseOrderDto> {
     return this.orderService.update(id, updateOrderDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remover um pedido pelo ID' })
-  @ApiResponse({ status: 200, description: 'Pedido removido com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Remove an order by ID' })
+  @ApiResponse({ status: 200, description: 'Request removed successfully', type: ResponseOrderDto })
   async remove(@Param('id') id: string): Promise<ResponseOrderDto> {
     return this.orderService.remove(id);
   }
 
   @Post(':id/transactions')
-  @ApiOperation({ summary: 'Adicionar uma transação a um pedido' })
-  @ApiResponse({ status: 200, description: 'Transação adicionada com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Add a transaction to an order' })
+  @ApiResponse({ status: 200, description: 'Transaction added successfully', type: ResponseOrderDto })
   async addTransaction(@Param('id') id: string, @Body() transaction: TransactionDto): Promise<ResponseOrderDto> {
     return this.orderService.addTransaction(id, transaction);
   }
 
   @Post(':id/fulfillments')
-  @ApiOperation({ summary: 'Adicionar um cumprimento a um pedido' })
-  @ApiResponse({ status: 200, description: 'Cumprimento adicionado com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Add a greeting to an order' })
+  @ApiResponse({ status: 200, description: 'Greeting added successfully', type: ResponseOrderDto })
   async addFulfillment(@Param('id') id: string, @Body() fulfillment: FulfillmentDto): Promise<ResponseOrderDto> {
     return this.orderService.addFulfillment(id, fulfillment);
   }
 
   @Post(':id/cancel')
-  @ApiOperation({ summary: 'Cancelar um pedido' })
-  @ApiResponse({ status: 200, description: 'Pedido cancelado com sucesso', type: ResponseOrderDto })
+  @ApiOperation({ summary: 'Cancel an order' })
+  @ApiResponse({ status: 200, description: 'Order cancelled successfully', type: ResponseOrderDto })
   async cancelOrder(@Param('id') id: string, @Body() cancelDetails: OrderCancelDto): Promise<ResponseOrderDto> {
     return this.orderService.cancelOrder(id, cancelDetails);
   }
