@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ZodValidationPipe } from './pipes/zod-validation.pipe';
-import { createOrderSchema } from './order/dto/create.order.dto';
+import { createOrderSchema } from './order/dto/order.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

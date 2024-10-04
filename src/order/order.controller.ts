@@ -1,12 +1,7 @@
 
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create.order.dto';
-import { UpdateOrderDto } from './dto/update.order.dto';
-import { ResponseOrderDto } from './dto/response.order.dto';
-import { FulfillmentDto } from './dto/fulfillment.dto';
-import { TransactionDto } from './dto/transaction.dto';
-import { OrderCancelDto } from './dto/cancel.order.dto';
+import { CreateOrderDto, UpdateOrderDto,ResponseOrderDto,FulfillmentDto,TransactionDto,OrderCancelDto } from './dto/order.dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Order')

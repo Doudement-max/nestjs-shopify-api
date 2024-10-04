@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { CreateOrderSchemaType } from './dto/create.order.dto';
+import { CreateOrderSchemaType, ResponseOrderDto } from './dto/order.dto';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ResponseOrderDto } from './dto/response.order.dto';
 
 const OrderSchemaZod = z.object({ 
   productId: z.string(), 
