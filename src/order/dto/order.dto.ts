@@ -85,73 +85,73 @@ export class FulfillmentDto {
   @ApiProperty({ description: 'Fulfillment Status' })
   status: string;
 
-  @ApiProperty({ description: 'Número de rastreamento' })
+  @ApiProperty({ description: 'Tracking Number' })
   tracking_number: string;
 
-  @ApiProperty({ description: 'URL de rastreamento' })
+  @ApiProperty({ description: 'Tracking Url' })
   tracking_url: string;
 }
 
 // *** Response DTO para pedidos ***
 export class ResponseOrderDto {
-  @ApiProperty({ description: 'ID do pedido' })
+  @ApiProperty({ description: 'Order Id' })
   id: string;
 
-  @ApiProperty({ description: 'ID do cliente' })
+  @ApiProperty({ description: 'Customer Id' })
   customerId: string;
 
-  @ApiProperty({ description: 'Nome do cliente' })
+  @ApiProperty({ description: 'Customer' })
   customer: string;
 
-  @ApiProperty({ description: 'Lista de itens do pedido' })
+  @ApiProperty({ description: 'Items List for Order' })
   items: string[];
 
-  @ApiProperty({ description: 'Valor total do pedido' })
+  @ApiProperty({ description: 'total value' })
   total: number;
 
-  @ApiProperty({ description: 'Itens detalhados do pedido', type: [LineItemDto] })
+  @ApiProperty({ description: 'Line Items Order', type: [LineItemDto] })
   lineItems: LineItemDto[];
 
-  @ApiProperty({ description: 'Valor total de impostos' })
+  @ApiProperty({ description: 'Total Tax' })
   totalTax: string;
 
-  @ApiProperty({ description: 'Moeda utilizada' })
+  @ApiProperty({ description: 'Currency' })
   currency: string;
 
-  @ApiProperty({ description: 'Email do cliente' })
+  @ApiProperty({ description: 'Email' })
   email: string;
 
-  @ApiProperty({ description: 'Data do pedido' })
+  @ApiProperty({ description: 'Order Data' })
   data: Date;
 
-  @ApiProperty({ description: 'Status do pedido' })
+  @ApiProperty({ description: 'Order Status' })
   status: string;
 }
 
 // *** Transaction DTO ***
 export class TransactionDto {
-  @ApiProperty({ description: 'Tipo de transação' })
+  @ApiProperty({ description: ' Transation Type' })
   kind: string;
 
-  @ApiProperty({ description: 'Status da transação' })
+  @ApiProperty({ description: 'Transation Status' })
   status: string;
 
-  @ApiProperty({ description: 'Montante da transação' })
+  @ApiProperty({ description: 'Transation Amount' })
   amount: string;
 
-  @ApiProperty({ description: 'Moeda utilizada' })
+  @ApiProperty({ description: 'Currency' })
   currency: string;
 
-  @ApiProperty({ description: 'Gateway de pagamento' })
+  @ApiProperty({ description: 'Payment Gateway' })
   gateway: string;
 }
 
 // *** DTO para cancelamento de pedido ***
 export class OrderCancelDto {
-  @ApiProperty({ description: 'Status do pedido' })
+  @ApiProperty({ description: 'Order Status' })
   status: string;
 
-  @ApiProperty({ description: 'Data de cancelamento' })
+  @ApiProperty({ description: 'Cancel Date' })
   cancelDate: Date;
 }
 

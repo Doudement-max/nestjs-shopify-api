@@ -56,7 +56,10 @@ export class CustomerController {
       throw error;
     }
   }
-
+ //New endpoint search orders for customer 
+ /*@Get(':id/orders') 
+ @ApiOperation({summary: 'Get all orders for a customer by ID' }) 
+ @ApiResponse({status: 200, description: 'Customerorders list', })*/ // continuar após ajustar os DTOs do Order usar apenas um dto para todos 
   @Put(':id')
   @ApiOperation({ summary: 'Update a customer by ID' })
   @ApiResponse({ status: 200, description: 'Client updated successfully', type: CreateCustomerDto })
