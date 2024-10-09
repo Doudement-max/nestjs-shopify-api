@@ -11,17 +11,17 @@ export class ProductService {
 
   async findAll(): Promise<ProductDto[]> {
     const products = await this.productModel.find().exec();
-    console.log(`Produto Recuperado: ${JSON.stringify(products)}`);
+    console.log(`Recovered Product: ${JSON.stringify(products)}`);
     return products;
   }
 
   async findOne(id: string): Promise<ProductDto> {
     const product = await this.productModel.findById(id).exec();
     if (!product) {
-      console.log(`Produto com ID ${id} não encontrado`);
-      throw new NotFoundException('Produto não encontrado');
+      console.log(`Product with ID ${id} not found`);
+      throw new NotFoundException('Product not found');
     }
-    console.log(`Produto recuperado: ${JSON.stringify(product)}`);
+    console.log(`Recovered product: ${JSON.stringify(product)}`);
     return product;
   }
 
@@ -31,27 +31,27 @@ export class ProductService {
     });
     const newProduct = new this.productModel(product);
     const savedProduct = await newProduct.save();
-    console.log(`Produto Criado: ${JSON.stringify(savedProduct)}`);
+    console.log(`Product Created: ${JSON.stringify(savedProduct)}`);
     return savedProduct;
   }
 
   async update(id: string, updateProductDto: ProductDto): Promise<ProductDto> {
     const updatedProduct = await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true }).exec();
     if (!updatedProduct) {
-      console.log(`Produto com ID ${id} não encontrado`);
-      throw new NotFoundException('Produto não encontrado');
+      console.log(`Product with ID ${id} not found`);
+      throw new NotFoundException('Product not found');
     }
-    console.log(`Produto Atualizado: ${JSON.stringify(updatedProduct)}`);
+    console.log(`Updated Product: ${JSON.stringify(updatedProduct)}`);
     return updatedProduct;
   }
 
   async remove(id: string): Promise<ProductDto> {
     const deletedProduct = await this.productModel.findByIdAndDelete(id).exec();
     if (!deletedProduct) {
-      console.log(`Produto com ID ${id} não encontrado`);
-      throw new NotFoundException('Produto não encontrado');
+      console.log(`Product with ID ${id} not found`);
+      throw new NotFoundException('Product not found');
     }
-    console.log(`Produto Removido: ${JSON.stringify(deletedProduct)}`);
+    console.log(`Product Removed: ${JSON.stringify(deletedProduct)}`);
     return deletedProduct;
   }
 

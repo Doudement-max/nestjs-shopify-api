@@ -113,7 +113,7 @@ export class CreateCustomerDto {
 
   @ApiProperty({ description: 'Email', required: true, format: 'email', example: 'user@exemplo.com'})
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, { message: 'Please provide a valid email address'})
   email: string;
 
   @ApiProperty({ description: 'Product Id', required: true })

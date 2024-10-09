@@ -2,7 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { ProductSchema, VariantSchema, OptionSchema, ImageSchema } from './product.schema';
+import { ProductSchema, VariantSchema, OptionSchema, ImageSchema } from './product.model';
 import { OrderModule } from 'src/order/order.module';
 import { CustomerModule } from 'src/customer/customer.module';
 
