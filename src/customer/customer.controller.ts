@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, Logger, BadRequestException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto, createCustomerSchemaZod } from './dto/customer.dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
+import { ZodError } from 'zod';
 
 @ApiTags('Customer')
 @Controller('customer')
@@ -14,16 +14,27 @@ export class CustomerController {
   @ApiOperation({ summary: 'Create a new customer' })
   @ApiResponse({ status: 201, description: 'Client created successfully', type: CreateCustomerDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @UsePipes(new ZodValidationPipe(createCustomerSchemaZod)) // Aplicar validação Zod
   async create(@Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log(`Receiving data to create the client: ${JSON.stringify(createCustomerDto)}`);
-    try {
+    
+    try { 
+      //Validação Zod 
+      createCustomerSchemaZod.parse(createCustomerDto); 
+      
+      //Criação do cliente via service
       const result = await this.customerService.create(createCustomerDto);
       this.logger.log(`Client created successfully: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
+      return result; 
+
+    } catch (error) { 
+      //Tratamento especifico para erros Zod 
+      if (error instanceof ZodError) {
+      this.logger.error(`Error creating client: ${error.errors.map(err => err.message).join(', ')}`);
+      throw new BadRequestException(error.errors); // erro 400 com detalhamento 
+
+      } 
+
       this.logger.error(`Error creating client: ${error.message}`);
-      throw error;
     }
   }
 
@@ -60,18 +71,28 @@ export class CustomerController {
  /*@Get(':id/orders') 
  @ApiOperation({summary: 'Get all orders for a customer by ID' }) 
  @ApiResponse({status: 200, description: 'Customerorders list', })*/ // continuar após ajustar os DTOs do Order usar apenas um dto para todos 
-  @Put(':id')
+  
+ @Put(':id')
   @ApiOperation({ summary: 'Update a customer by ID' })
   @ApiResponse({ status: 200, description: 'Client updated successfully', type: CreateCustomerDto })
   async update(@Param('id') id: string, @Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log(`Updating client with ID ${id}`);
-    try {
+    try { 
+       
+      createCustomerSchemaZod.parse(createCustomerDto);
+      
       const result = await this.customerService.update(id, createCustomerDto);
       this.logger.log(`Client updated successfully: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      this.logger.error(`Error updating client with ID${id}: ${error.message}`);
-      throw error;
+      return result; 
+
+    } catch (error) { 
+      if (error instanceof ZodError) {
+      this.logger.error(`Validation error: ${error.errors.map(err => err.message).join(', ')}`);
+      throw error; 
+      } 
+
+      this.logger.error(`Error updating client with ID ${id}: ${error.message}`); 
+      throw error; 
     }
   }
 

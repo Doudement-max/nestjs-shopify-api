@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
 
-// Esquema Mongoose
+// Mongoose schema for the client
 export const customerMongooseSchema = new Schema({
-  customerId: { type: String, required: true },
+  customerId: { type: String, required: true },  
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
@@ -23,8 +23,6 @@ export const customerMongooseSchema = new Schema({
     zip: String,
     default: Boolean,
   }],
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
   state: { type: String },
   note: { type: String },
   verifiedEmail: { type: Boolean },
@@ -55,7 +53,9 @@ export const customerMongooseSchema = new Schema({
     zip: String,
     default: Boolean,
   }
+}, {
+  timestamps: true  // Mongoose schema for the client
 });
 
-// Exportando o modelo Mongoose
-export const CustomerModel = model('CustomerModel', customerMongooseSchema);
+//Exporting the Mongoose model
+export const CustomerModel = model('Customer', customerMongooseSchema);

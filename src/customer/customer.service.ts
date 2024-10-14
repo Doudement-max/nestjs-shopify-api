@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CustomerModel } from './customer.model'; // Import the Mongoose model
-import { validateCustomer } from './dto/customer.dto'; 
+import { createCustomerSchemaZod } from './dto/customer.dto'; 
 import { CreateCustomerDto } from './dto/customer.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ZodError } from 'zod';
 
 @Injectable()
 export class CustomerService {
@@ -16,9 +17,9 @@ export class CustomerService {
   async findAll(): Promise<CreateCustomerDto[]> {
     try {
       this.logger.log('Searching all customers...');
-      const customerModel = await this.customerModel.find().exec();
-      this.logger.log(`Recovered customers: ${JSON.stringify(customerModel)}`);
-      return customerModel;
+      const customers = await this.customerModel.find().exec();
+      this.logger.log(`Recovered customers: ${JSON.stringify(customers)}`);
+      return customers;
     } catch (error) {
       this.logger.error(`Failed to fetch customers: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve customers');
@@ -44,31 +45,45 @@ export class CustomerService {
   async create(createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log('Validating customer data...');
     try {
-      validateCustomer(createCustomerDto); 
+      // Use schema directly for validation
+      createCustomerSchemaZod.parse(createCustomerDto); 
       this.logger.log('Customer data successfully validated!');
       
       const newCustomer = new this.customerModel(createCustomerDto); 
       const savedCustomer = await newCustomer.save(); 
 
+      // Generate customerId based on MongoDB _id
       savedCustomer.customerId = savedCustomer._id.toHexString(); 
       await savedCustomer.save(); 
 
       this.logger.log(`Customer created with ID: ${savedCustomer.customerId}`); 
       return savedCustomer; 
     } catch (error) {
-      this.logger.error(`Validation error: ${error.message}`);
-      throw new BadRequestException('Invalid customer data');
+      // Zod error handling
+      if (error instanceof ZodError) {
+        this.logger.error(`Validation error: ${JSON.stringify(error.errors)}`);
+        throw new BadRequestException(error.errors.map(e => e.message).join(', '));
+      } else {
+        this.logger.error(`Internal error: ${error.message}`);
+        throw new InternalServerErrorException('Failed to create customer');
+      }
     }
   }
 
   async update(id: string, createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log(`Updating client with ID: ${id}`);
     try {
-      validateCustomer(createCustomerDto);
+      // Use schema directly for validation
+      createCustomerSchemaZod.parse(createCustomerDto);
       this.logger.log('Customer data successfully validated!');
     } catch (error) {
-      this.logger.error(`Validation error: ${error.message}`);
-      throw new BadRequestException('Invalid customer data');
+      if (error instanceof ZodError) {
+        this.logger.error(`Validation error: ${JSON.stringify(error.errors)}`);
+        throw new BadRequestException(error.errors.map(e => e.message).join(', '));
+      } else {
+        this.logger.error(`Internal error: ${error.message}`);
+        throw new InternalServerErrorException('Failed to update customer');
+      }
     }
 
     try {
@@ -81,7 +96,7 @@ export class CustomerService {
       this.logger.log(`Client updated successfully: ${JSON.stringify(updatedCustomer)}`);
       return updatedCustomer;
     } catch (error) {
-      this.logger.error(`Failed to update client with ID${id}: ${error.message}`);
+      this.logger.error(`Failed to update client with ID ${id}: ${error.message}`);
       throw new InternalServerErrorException('Failed to update client');
     }
   }

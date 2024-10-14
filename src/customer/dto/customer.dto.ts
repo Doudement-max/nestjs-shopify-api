@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { LineItemDto } from 'src/order/dto/order.dto';
 import { date, z } from 'zod';
-import { IsDate, IsEmail, IsOptional, IsString } from 'class-validator';
+
 
 // Esquema Zod para Address
 export const addressSchemaZod = z.object({
@@ -21,16 +21,16 @@ export const addressSchemaZod = z.object({
 });
 
 export const createCustomerSchemaZod = z.object({
-  customerId: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email().optional(),
+  customerId: z.string().min(1,"Customer ID cannot be empty"),
+  firstName: z.string().min(1,"Fist name cannot be empty"),
+  lastName: z.string().min(1,"Last name cannot be empty"),
+  email: z.string().email("Invalid email address").optional(),
   phone: z.string().optional(),
   verified_email: z.boolean().optional(),
   addresses: z.array(addressSchemaZod).optional(),
   verifiedEmail: z.boolean().optional(),
   acceptsMarketing: z.boolean(),
-  data: z.union([z.string(), z.date()]), // Simplesmente validando como Date no Zod
+  data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]), // Simplesmente validando como Date no Zod
 });
 
 // Classe AddressDto
@@ -101,30 +101,21 @@ export class CreateCustomerDto {
   @ApiProperty({ description: 'Id', required: true })
   id: number;
 
-  @ApiProperty({ description: 'First Name' })
-  @IsOptional()
-  @IsString() 
+  @ApiProperty({ description: 'First Name' }) 
   firstName: string;
 
   @ApiProperty({ description: 'Last Name' })
-  @IsOptional()
-  @IsString()
   lastName: string;
 
   @ApiProperty({ description: 'Email', required: true, format: 'email', example: 'user@exemplo.com'})
-  @IsOptional()
-  @IsEmail({}, { message: 'Please provide a valid email address'})
   email: string;
 
   @ApiProperty({ description: 'Product Id', required: true })
   productId: string;
 
   @ApiProperty({ description: 'Phone', required: true })
-  @IsOptional()
-  @IsString()
   phone?: string;
 
-  @IsDate()
   @ApiProperty({ description: 'Data', required: true, type: Date, format: 'date-time' })
   data: Date;
 
