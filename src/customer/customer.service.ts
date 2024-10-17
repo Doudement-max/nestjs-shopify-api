@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
-import { CustomerModel } from './customer.model'; // Import the Mongoose model
-import { createCustomerSchemaZod } from './dto/customer.dto'; 
-import { CreateCustomerDto } from './dto/customer.dto';
+import { CustomerModel } from './customer.model'; // Importar o modelo do Mongoose
+import { createCustomerSchemaZod, CreateCustomerDto } from './dto/customer.dto'; // Tipos bem definidos
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ZodError } from 'zod';
@@ -11,9 +10,21 @@ export class CustomerService {
   private readonly logger = new Logger(CustomerService.name);
 
   constructor(
-    @InjectModel(CustomerModel.name) private readonly customerModel: Model<CreateCustomerDto>,
+    @InjectModel(CustomerModel.name) private readonly customerModel: Model<CreateCustomerDto>, // Tipagem do Mongoose Model
   ) {}
 
+  // Função auxiliar para lidar com erros do Zod
+  private handleZodError(error: unknown): void {
+    if (error instanceof ZodError) {
+      this.logger.error(`Validation error: ${JSON.stringify(error.errors)}`);
+      throw new BadRequestException(error.errors.map(e => e.message).join(', '));
+    } else {
+      this.logger.error(`Internal error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new InternalServerErrorException('Operation failed');
+    }
+  }
+
+  // Recuperar todos os clientes
   async findAll(): Promise<CreateCustomerDto[]> {
     try {
       this.logger.log('Searching all customers...');
@@ -21,11 +32,12 @@ export class CustomerService {
       this.logger.log(`Recovered customers: ${JSON.stringify(customers)}`);
       return customers;
     } catch (error) {
-      this.logger.error(`Failed to fetch customers: ${error.message}`);
+      this.logger.error(`Failed to fetch customers: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new InternalServerErrorException('Failed to retrieve customers');
     }
   }
 
+  // Recuperar cliente por ID
   async findOne(id: string): Promise<CreateCustomerDto> {
     try {
       this.logger.log(`Fetching customer by ID: ${id}`);
@@ -37,53 +49,40 @@ export class CustomerService {
       this.logger.log(`Recovered customer: ${JSON.stringify(customer)}`);
       return customer;
     } catch (error) {
-      this.logger.error(`Failed to search for customer with ID ${id}: ${error.message}`);
+      this.logger.error(`Failed to search for customer with ID ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new InternalServerErrorException('Failed to search for customer with ID');
     }
   }
 
+  // Criar novo cliente
   async create(createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log('Validating customer data...');
     try {
-      // Use schema directly for validation
-      createCustomerSchemaZod.parse(createCustomerDto); 
+      // Validação Zod diretamente no DTO
+      createCustomerSchemaZod.parse(createCustomerDto);
       this.logger.log('Customer data successfully validated!');
       
-      const newCustomer = new this.customerModel(createCustomerDto); 
+      // Criação e salvamento do cliente no banco
+      const newCustomer = new this.customerModel(createCustomerDto);
+      newCustomer.customerId = newCustomer._id.toHexString(); // Gerar customerId com base no _id do MongoDB
       const savedCustomer = await newCustomer.save(); 
 
-      // Generate customerId based on MongoDB _id
-      savedCustomer.customerId = savedCustomer._id.toHexString(); 
-      await savedCustomer.save(); 
-
-      this.logger.log(`Customer created with ID: ${savedCustomer.customerId}`); 
-      return savedCustomer; 
+      this.logger.log(`Customer created with ID: ${savedCustomer.customerId}`);
+      return savedCustomer;
     } catch (error) {
-      // Zod error handling
-      if (error instanceof ZodError) {
-        this.logger.error(`Validation error: ${JSON.stringify(error.errors)}`);
-        throw new BadRequestException(error.errors.map(e => e.message).join(', '));
-      } else {
-        this.logger.error(`Internal error: ${error.message}`);
-        throw new InternalServerErrorException('Failed to create customer');
-      }
+      this.handleZodError(error); // Tratamento centralizado de erros
     }
   }
 
+  // Atualizar cliente por ID
   async update(id: string, createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
     this.logger.log(`Updating client with ID: ${id}`);
     try {
-      // Use schema directly for validation
+      // Validação Zod diretamente no DTO
       createCustomerSchemaZod.parse(createCustomerDto);
       this.logger.log('Customer data successfully validated!');
     } catch (error) {
-      if (error instanceof ZodError) {
-        this.logger.error(`Validation error: ${JSON.stringify(error.errors)}`);
-        throw new BadRequestException(error.errors.map(e => e.message).join(', '));
-      } else {
-        this.logger.error(`Internal error: ${error.message}`);
-        throw new InternalServerErrorException('Failed to update customer');
-      }
+      this.handleZodError(error);
     }
 
     try {
@@ -96,11 +95,12 @@ export class CustomerService {
       this.logger.log(`Client updated successfully: ${JSON.stringify(updatedCustomer)}`);
       return updatedCustomer;
     } catch (error) {
-      this.logger.error(`Failed to update client with ID ${id}: ${error.message}`);
+      this.logger.error(`Failed to update client with ID ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new InternalServerErrorException('Failed to update client');
     }
   }
 
+  // Remover cliente por ID
   async remove(id: string): Promise<CreateCustomerDto> {
     this.logger.log(`Removing client with ID: ${id}`);
     try {
@@ -113,7 +113,7 @@ export class CustomerService {
       this.logger.log(`Client removed successfully: ${JSON.stringify(deletedCustomer)}`);
       return deletedCustomer;
     } catch (error) {
-      this.logger.error(`Failed to remove customer with ID ${id}: ${error.message}`);
+      this.logger.error(`Failed to remove customer with ID ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new InternalServerErrorException('Failed to remove client');
     }
   }

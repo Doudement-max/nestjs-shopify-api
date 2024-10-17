@@ -22,9 +22,9 @@ export const addressSchemaZod = z.object({
 
 export const createCustomerSchemaZod = z.object({
   customerId: z.string().min(1,"Customer ID cannot be empty"),
-  firstName: z.string().min(1,"Fist name cannot be empty"),
-  lastName: z.string().min(1,"Last name cannot be empty"),
-  email: z.string().email("Invalid email address").optional(),
+  firstName: z.string().min(1,"Fist name is required"),
+  lastName: z.string().min(1,"Last name is required"),
+  email: z.string().email("Invalid email address").min(1, "Email is required"),
   phone: z.string().optional(),
   verified_email: z.boolean().optional(),
   addresses: z.array(addressSchemaZod).optional(),
@@ -101,13 +101,13 @@ export class CreateCustomerDto {
   @ApiProperty({ description: 'Id', required: true })
   id: number;
 
-  @ApiProperty({ description: 'First Name' }) 
+  @ApiProperty({ description: 'First Name', required: true }) 
   firstName: string;
 
-  @ApiProperty({ description: 'Last Name' })
+  @ApiProperty({ description: 'Last Name', required: true })
   lastName: string;
 
-  @ApiProperty({ description: 'Email', required: true, format: 'email', example: 'user@exemplo.com'})
+  @ApiProperty({ description: 'Email', required: true})
   email: string;
 
   @ApiProperty({ description: 'Product Id', required: true })
