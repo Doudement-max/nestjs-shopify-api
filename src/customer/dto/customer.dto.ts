@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { LineItemDto } from 'src/order/dto/order.dto';
-import { date, z } from 'zod';
-
+import { z } from 'zod';
+import { createZodDto } from '@anatine/zod-nestjs';
 
 // Esquema Zod para Address
 export const addressSchemaZod = z.object({
@@ -76,7 +76,7 @@ export class AddressDto {
 }
 
 // Classe CreateCustomerDto
-export class CreateCustomerDto {
+export class CreateCustomerDto  extends createZodDto(createCustomerSchemaZod){
   @ApiProperty({ description: 'Customer', required: true })
   customer: string;
 
@@ -107,7 +107,7 @@ export class CreateCustomerDto {
   @ApiProperty({ description: 'Last Name', required: true })
   lastName: string;
 
-  @ApiProperty({ description: 'Email', required: true})
+  @ApiProperty({ description: 'Customer Email', required: true, format: 'email'})
   email: string;
 
   @ApiProperty({ description: 'Product Id', required: true })
@@ -126,7 +126,13 @@ export class CreateCustomerDto {
   verifiedEmail: boolean;
 
   @ApiProperty({ description: 'Accepts Marketing' })
-  acceptsMarketing: boolean;
+  acceptsMarketing: boolean; 
+
+  @ApiProperty({ description: 'Address', example: '123 Main St', required: false })
+  address?: string;
+
+  @ApiProperty({ description: 'Is customer verified?', example: true })
+  verified: boolean;
 }
 
 // Função de validação utilizando Zod

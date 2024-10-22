@@ -62,17 +62,23 @@ export class CustomerService {
       createCustomerSchemaZod.parse(createCustomerDto);
       this.logger.log('Customer data successfully validated!');
       
+      // Verifica se o campo email está presente e é válido
+      if (!createCustomerDto.email) {
+        throw new BadRequestException('Email is required and must be valid');
+      }
+  
       // Criação e salvamento do cliente no banco
       const newCustomer = new this.customerModel(createCustomerDto);
       newCustomer.customerId = newCustomer._id.toHexString(); // Gerar customerId com base no _id do MongoDB
       const savedCustomer = await newCustomer.save(); 
-
+  
       this.logger.log(`Customer created with ID: ${savedCustomer.customerId}`);
       return savedCustomer;
     } catch (error) {
       this.handleZodError(error); // Tratamento centralizado de erros
     }
   }
+  
 
   // Atualizar cliente por ID
   async update(id: string, createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {

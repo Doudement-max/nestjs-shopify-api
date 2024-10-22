@@ -1,107 +1,58 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, Logger, BadRequestException } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { CreateCustomerDto, createCustomerSchemaZod } from './dto/customer.dto';
+import { CreateCustomerDto, createCustomerSchemaZod } from './dto/customer.dto'; // já estendido de Zod DTO
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { ZodError } from 'zod';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 
 @ApiTags('Customer')
 @Controller('customer')
 export class CustomerController {
-  private readonly logger = new Logger(CustomerController.name); // Instância do Logger
+  private readonly logger = new Logger(CustomerController.name); 
+
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new customer' })
-  @ApiResponse({ status: 201, description: 'Client created successfully', type: CreateCustomerDto })
+  @ApiResponse({ status: 201, description: 'Customer created successfully', type: CreateCustomerDto })
   @ApiResponse({ status: 400, description: 'Bad Request' }) 
-  @UsePipes(new ZodValidationPipe(createCustomerSchemaZod))
+  @UsePipes(new ZodValidationPipe(createCustomerSchemaZod)) // Aplicando o ZodValidationPipe
   async create(@Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
-    this.logger.log(`Receiving data to create the client: ${JSON.stringify(createCustomerDto)}`);
-    
-    try { 
-      //Criação do cliente via service
+    this.logger.log(`Creating customer: ${JSON.stringify(createCustomerDto)}`);
+    try {
       const result = await this.customerService.create(createCustomerDto);
-      this.logger.log(`Client created successfully: ${JSON.stringify(result)}`);
-      return result; 
-
-    } catch (error) { 
-      //Tratamento especifico para erros Zod 
-      if (error instanceof ZodError) {
-      this.logger.error(`Error creating client: ${error.errors.map(err => err.message).join(', ')}`);
-      throw new BadRequestException(error.errors); // erro 400 com detalhamento 
-      } 
-
-      this.logger.error(`Error creating client: ${error.message}`);
+      this.logger.log(`Customer created successfully: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Error creating customer: ${error.message}`);
+      throw new BadRequestException(error);
     }
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all customers' })
-  @ApiResponse({ status: 200, description: 'Customer list', type: [CreateCustomerDto] })
-  async findAll( 
-   
-  ): Promise<CreateCustomerDto[]> {
-    this.logger.log('Searching customers with email: ${email}, firstName: ${firstName}, lastName: ${lastName}');
-    try {
-      const result = await this.customerService.findAll();
-      this.logger.log(`Successfully Obtained Clients: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      this.logger.error(`Error getting customers: ${error.message}`);
-      throw error;
-    }
+  @ApiResponse({ status: 200, description: 'List of all customers', type: [CreateCustomerDto] })
+  async findAll(): Promise<CreateCustomerDto[]> {
+    return this.customerService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a customer by ID' })
   @ApiResponse({ status: 200, description: 'Customer data', type: CreateCustomerDto })
   async findOne(@Param('id') id: string): Promise<CreateCustomerDto> {
-    this.logger.log(`Getting customer by ID: ${id}`);
-    try {
-      const result = await this.customerService.findOne(id);
-      this.logger.log(`Client successfully obtained: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      this.logger.error(`Error getting customer ID ${id}: ${error.message}`);
-      throw error;
-    }
+    return this.customerService.findOne(id);
   }
 
- @Put(':id')
+  @Put(':id')
   @ApiOperation({ summary: 'Update a customer by ID' })
-  @ApiResponse({ status: 200, description: 'Client updated successfully', type: CreateCustomerDto })
+  @ApiResponse({ status: 200, description: 'Customer updated successfully', type: CreateCustomerDto })
   async update(@Param('id') id: string, @Body() createCustomerDto: CreateCustomerDto): Promise<CreateCustomerDto> {
-    this.logger.log(`Updating client with ID ${id}`);
-    try { 
-      const result = await this.customerService.update(id, createCustomerDto);
-      this.logger.log(`Client updated successfully: ${JSON.stringify(result)}`);
-      return result; 
-
-    } catch (error) { 
-      if (error instanceof ZodError) {
-      this.logger.error(`Validation error: ${error.errors.map(err => err.message).join(', ')}`);
-      throw error; 
-      } 
-
-      this.logger.error(`Error updating client with ID ${id}: ${error.message}`); 
-      throw error; 
-    }
+    return this.customerService.update(id, createCustomerDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove a customer by ID' })
-  @ApiResponse({ status: 200, description: 'Client removed successfully', type: CreateCustomerDto })
+  @ApiResponse({ status: 200, description: 'Customer removed successfully', type: CreateCustomerDto })
   async remove(@Param('id') id: string): Promise<CreateCustomerDto> {
-    this.logger.log(`Removing client with ID ${id}`);
-    try {
-      const result = await this.customerService.remove(id);
-      this.logger.log(`Client removed successfully: ${JSON.stringify(result)}`);
-      return result;
-    } catch (error) {
-      this.logger.error(`Error removing customer with ID${id}: ${error.message}`);
-      throw error;
-    }
+    return this.customerService.remove(id);
   }
 }
-
