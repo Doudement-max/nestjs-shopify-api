@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-// Mongoose schema for the client
+// Mongoose schema for the client 
 export const customerMongooseSchema = new Schema({
   customerId: { type: String, required: true },  
   firstName: { type: String, required: true },

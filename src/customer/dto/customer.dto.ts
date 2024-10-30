@@ -30,7 +30,7 @@ export const createCustomerSchemaZod = z.object({
   addresses: z.array(addressSchemaZod).optional(),
   verifiedEmail: z.boolean().optional(),
   acceptsMarketing: z.boolean(),
-  data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]), // Simplesmente validando como Date no Zod
+  data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]),
 });
 
 // Classe AddressDto
@@ -76,7 +76,7 @@ export class AddressDto {
 }
 
 // Classe CreateCustomerDto
-export class CreateCustomerDto  extends createZodDto(createCustomerSchemaZod){
+export class CreateCustomerDto extends createZodDto(createCustomerSchemaZod) {
   @ApiProperty({ description: 'Customer', required: true })
   customer: string;
 
@@ -95,7 +95,7 @@ export class CreateCustomerDto  extends createZodDto(createCustomerSchemaZod){
   @ApiProperty({ description: 'Total Tax', required: true })
   totalTax: string;
 
-  @ApiProperty({ description: 'Curryncy', required: true })
+  @ApiProperty({ description: 'Currency', required: true })
   currency: string;
 
   @ApiProperty({ description: 'Id', required: true })
@@ -109,6 +109,9 @@ export class CreateCustomerDto  extends createZodDto(createCustomerSchemaZod){
 
   @ApiProperty({ description: 'Customer Email', required: true, format: 'email'})
   email: string;
+ 
+  @ApiProperty({ description: 'Customer Password', required: true })
+  password: string; 
 
   @ApiProperty({ description: 'Product Id', required: true })
   productId: string;
@@ -133,6 +136,15 @@ export class CreateCustomerDto  extends createZodDto(createCustomerSchemaZod){
 
   @ApiProperty({ description: 'Is customer verified?', example: true })
   verified: boolean;
+}
+
+// Novo tipo de resposta CreateCustomerResponse
+export class CreateCustomerResponse {
+  @ApiProperty({ type: CreateCustomerDto })
+  customer: CreateCustomerDto;
+
+  @ApiProperty({ description: 'JWT authentication token' })
+  token: string;
 }
 
 // Função de validação utilizando Zod
