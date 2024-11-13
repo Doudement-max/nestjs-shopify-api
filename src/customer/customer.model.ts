@@ -2,7 +2,8 @@ import { Schema, model, Document } from 'mongoose';
 
 // Define an interface for the Customer document
 export interface ICustomer extends Document {
-  customerId: string;
+  customerId: string; 
+  data: Date;
   firstName: string;
   lastName: string;
   email: string;
@@ -57,6 +58,7 @@ export interface ICustomer extends Document {
 
 // Mongoose schema definition
 export const customerMongooseSchema = new Schema<ICustomer>({
+  data: { type: Date, required: true }, 
   customerId: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },

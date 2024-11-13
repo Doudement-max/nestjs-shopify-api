@@ -11,6 +11,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new ZodErrorFilter());
 
+    // Patching Swagger with Zod
+    patchNestjsSwagger();
+    
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('API Shopify')
