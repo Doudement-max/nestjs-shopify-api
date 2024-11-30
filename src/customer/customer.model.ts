@@ -2,114 +2,71 @@ import { Schema, model, Document } from 'mongoose';
 
 // Define an interface for the Customer document
 export interface ICustomer extends Document {
-  customerId: string; 
-  data: Date;
-  firstName: string;
-  lastName: string;
+  customerId: string;
   email: string;
-  phone?: string;
-  order?: string[];
+  password: string;
+  passwordConfirmation: string;
+  verifiedEmail?: boolean; 
+  data: Date;
   addresses?: {
     address1?: string;
     address2?: string;
     city?: string;
-    company?: string;
-    country?: string;
-    countryCode?: string;
-    countryName?: string;
-    name?: string;
-    phone?: string;
     province?: string;
-    provinceCode?: string;
+    phone?: string;
     zip?: string;
-    default?: boolean;
+    lastName?: string;
+    firstName?: string;
+    country?: string;
   }[];
-  state?: string;
-  note?: string;
-  verifiedEmail?: boolean;
-  tags?: string;
-  lastOrderId?: string;
-  lastOrderName?: string;
-  currency?: string;
-  acceptsMarketing?: boolean;
-  marketingOptInLevel?: string;
-  taxExempt?: boolean;
-  taxExemptions?: string[];
-  totalSpent?: string;
-  orderCount?: number;
-  multipassIdentifier?: string;
-  adminGraphqlApiId?: string;
-  defaultAddress?: {
-    address1?: string;
-    address2?: string;
-    city?: string;
-    company?: string;
-    country?: string;
-    countryCode?: string;
-    countryName?: string;
-    name?: string;
-    phone?: string;
-    province?: string;
-    provinceCode?: string;
-    zip?: string;
-    default?: boolean;
-  };
+  metafields?: {
+    key: string;
+    value: string;
+    type: string;
+    namespace: string;
+  }[];
+  customer: any;
+  items: any;
+  total: any;
+  line_items: any;
+  totalTax: string; // Adicionado
+  currency: string; // Adicionado
+  firstName: string; // Adicionado
+  lastName: string; // Adicionado
 }
 
 // Mongoose schema definition
 export const customerMongooseSchema = new Schema<ICustomer>({
-  data: { type: Date, required: true }, 
-  customerId: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  customerId: { type: String,},
   email: { type: String, required: true },
-  phone: { type: String },
-  order: [{ type: String }],
+  password: { type: String, required: true },
+  passwordConfirmation: { type: String, required: true },
+  verifiedEmail: { type: Boolean },
   addresses: [{
     address1: String,
     address2: String,
     city: String,
-    company: String,
-    country: String,
-    countryCode: String,
-    countryName: String,
-    name: String,
-    phone: String,
     province: String,
-    provinceCode: String,
+    phone: String,
     zip: String,
-    default: Boolean,
+    lastName: String,
+    firstName: String,
+    country: String,
   }],
-  state: { type: String },
-  note: { type: String },
-  verifiedEmail: { type: Boolean },
-  tags: { type: String },
-  lastOrderId: { type: String },
-  lastOrderName: { type: String },
-  currency: { type: String },
-  acceptsMarketing: { type: Boolean },
-  marketingOptInLevel: { type: String },
-  taxExempt: { type: Boolean },
-  taxExemptions: [{ type: String }],
-  totalSpent: { type: String },
-  orderCount: { type: Number },
-  multipassIdentifier: { type: String },
-  adminGraphqlApiId: { type: String },
-  defaultAddress: {
-    address1: String,
-    address2: String,
-    city: String,
-    company: String,
-    country: String,
-    countryCode: String,
-    countryName: String,
-    name: String,
-    phone: String,
-    province: String,
-    provinceCode: String,
-    zip: String,
-    default: Boolean,
-  }
+  metafields: [{
+    key: String,
+    value: String,
+    type: String,
+    namespace: String,
+  }],
+  customer: Schema.Types.Mixed,
+  items: Schema.Types.Mixed,
+  total: Schema.Types.Mixed,
+  line_items: Schema.Types.Mixed,
+  totalTax: { type: String }, // Adicionado
+  currency: { type: String }, // Adicionado
+  firstName: { type: String, required: true }, // Adicionado
+  lastName: { type: String, required: true }, // Adicionado
 }, {
   timestamps: true
 });

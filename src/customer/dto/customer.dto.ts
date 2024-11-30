@@ -1,9 +1,9 @@
-import { ApiProperty, ApiExtraModels } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { LineItemDto } from 'src/order/dto/order.dto';
 import { z } from 'zod';
-import { createZodDto } from '@anatine/zod-nestjs'; 
- 
+import { createZodDto } from '@anatine/zod-nestjs';
 
-// Zod Schema for validation
+// Esquema Zod para Address
 export const addressSchemaZod = z.object({
   address1: z.string().optional(),
   address2: z.string().optional(),
@@ -21,97 +21,122 @@ export const addressSchemaZod = z.object({
 });
 
 export const createCustomerSchemaZod = z.object({
-  customerId: z.string().min(1, "Customer ID cannot be empty"),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  customerId: z.string().min(1,"Customer ID cannot be empty"),
+  firstName: z.string().min(1,"Fist name is required"),
+  lastName: z.string().min(1,"Last name is required"),
   email: z.string().email("Invalid email address").min(1, "Email is required"),
   phone: z.string().optional(),
-  verifiedEmail: z.boolean().optional(),
+  verified_email: z.boolean().optional(),
   addresses: z.array(addressSchemaZod).optional(),
-  acceptsMarketing: z.boolean(),
-  data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]),
-}); 
+  verifiedEmail: z.boolean().optional(),
+  data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]), // Simplesmente validando como Date no Zod
+});
 
-@ApiExtraModels(AddressDto)
+// Classe AddressDto
 export class AddressDto {
-  @ApiProperty({ description: 'First line of address', required: false })
+  @ApiProperty({ description: 'First line of address', required: true })
   address1?: string;
 
-  @ApiProperty({ description: 'Second line of address', required: false })
+  @ApiProperty({ description: 'Second line of address', required: true })
   address2?: string;
 
-  @ApiProperty({ description: 'City', required: false })
+  @ApiProperty({ description: 'City', required: true })
   city?: string;
 
-  @ApiProperty({ description: 'Company name', required: false })
+  @ApiProperty({ description: 'Company name', required: true })
   company?: string;
 
-  @ApiProperty({ description: 'Country', required: false })
+  @ApiProperty({ description: 'Country', required: true })
   country?: string;
 
-  @ApiProperty({ description: 'Country code', required: false })
+  @ApiProperty({ description: 'Country code', required: true })
   countryCode?: string;
 
-  @ApiProperty({ description: 'Country name', required: false })
+  @ApiProperty({ description: 'Country name', required: true })
   countryName?: string;
 
-  @ApiProperty({ description: 'Name', required: false })
+  @ApiProperty({ description: 'Name', required: true })
   name?: string;
 
-  @ApiProperty({ description: 'Phone number', required: false })
+  @ApiProperty({ description: 'Phone number', required: true })
   phone?: string;
 
-  @ApiProperty({ description: 'Province', required: false })
+  @ApiProperty({ description: 'Province', required: true })
   province?: string;
 
-  @ApiProperty({ description: 'Province code', required: false })
+  @ApiProperty({ description: 'Province code', required: true })
   provinceCode?: string;
 
-  @ApiProperty({ description: 'Zip code', required: false })
+  @ApiProperty({ description: 'Zip code', required: true })
   zip?: string;
 
-  @ApiProperty({ description: 'Is it the default address?', required: false })
+  @ApiProperty({ description: 'Is it the default address?', required: true })
   default?: boolean;
 }
 
-@ApiExtraModels(AddressDto)
+// Classe CreateCustomerDto
 export class CreateCustomerDto extends createZodDto(createCustomerSchemaZod) {
-  @ApiProperty({ description: 'Customer ID', required: true })
+  @ApiProperty({ description: 'Customer', required: true })
+  customer: string;
+
+  @ApiProperty({ description: 'Customer Items', required: true })
+  items: string[];
+
+  @ApiProperty({ description: 'Customer Id' })
   customerId: string;
 
-  //@ApiProperty({ description: 'Customer first name', required: true })
-  //firstName: string;
+  @ApiProperty({ description: 'Total', required: true })
+  total: number;
 
-  //@ApiProperty({ description: 'Customer last name', required: true })
-  //lastName: string;
+  @ApiProperty({ description: 'Line Items', type: [LineItemDto], required: false })
+  line_items: LineItemDto[];
 
-  //@ApiProperty({ description: 'Customer email', required: true, format: 'email' }) 
-  //email: string;
+  @ApiProperty({ description: 'Total Tax', required: true })
+  totalTax: string;
 
-  @ApiProperty({ description: 'Phone number', required: false })
+  @ApiProperty({ description: 'Currency', required: true })
+  currency: string;
+
+  @ApiProperty({ description: 'Id', required: true })
+  id?: number;
+
+  @ApiProperty({ description: 'First Name', required: true }) 
+  firstName: string;
+
+  @ApiProperty({ description: 'Last Name', required: true })
+  lastName: string;
+
+  @ApiProperty({ description: 'Customer Email', required: true, format: 'email'})
+  email: string;
+ 
+  @ApiProperty({ description: 'Customer Password', required: true })
+  password: string; 
+
+  @ApiProperty({ description: 'Phone', required: true })
   phone?: string;
 
-  @ApiProperty({ description: 'List of addresses', type: [AddressDto], required: false })
+  @ApiProperty({ description: 'Data', required: true, type: Date, format: 'date-time' })
+  data: Date;
+
+  @ApiProperty({ description: 'Addresses', type: [AddressDto], required: false })
   addresses?: AddressDto[];
 
-  @ApiProperty({ description: 'Whether the email is verified', required: false })
+  @ApiProperty({ description: 'Verified Email', required: true })
   verifiedEmail?: boolean;
 
-  @ApiProperty({ description: 'Accepts marketing', required: true })
-  acceptsMarketing: boolean;
+  @ApiProperty({ description: 'Address', example: '123 Main St', required: false })
+  address?: string;
 
-  @ApiProperty({ description: 'Date associated with customer', required: true, type: Date, format: 'date-time' })
-  data: Date;
+  passwordConfirmation: any;
 }
 
+// Novo tipo de resposta CreateCustomerResponse
 export class CreateCustomerResponse {
   @ApiProperty({ type: CreateCustomerDto })
-  customer: Partial<CreateCustomerDto>;
-
+  customer: CreateCustomerDto;
   @ApiProperty({ description: 'JWT authentication token' })
   token: string;
 }
-
 // Função de validação utilizando Zod
 export const validateCustomer = (data: any) => {
   return createCustomerSchemaZod.parse(data);

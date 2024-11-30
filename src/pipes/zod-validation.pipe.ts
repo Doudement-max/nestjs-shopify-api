@@ -13,17 +13,19 @@ export class ZodValidationPipe implements PipeTransform {
         return value;
     }
 } */
+    
+    
 import { ArgumentMetadata, BadRequestException, PipeTransform } from '@nestjs/common';
 import { ZodSchema } from 'zod';
 
 export class ZodValidationPipe implements PipeTransform {
   constructor(private schema: ZodSchema<any>) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
-    try {
-      return this.schema.parse(value);
-    } catch (e) {
-      throw new BadRequestException(e.errors);
+  transform(value: any, _metadata: ArgumentMetadata) {
+    const result = this.schema.safeParse(value);
+    if (!result.success) {
+      throw new BadRequestException(result.error.errors.map(e => e.message).join(', '));
     }
+    return result.data;  // Retorna os dados validados
   }
 }
