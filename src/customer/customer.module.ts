@@ -8,7 +8,7 @@ import { CustomerModel, customerMongooseSchema } from './customer.model';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: CustomerModel.name, schema: customerMongooseSchema }]),
+    MongooseModule.forFeature([{ name: 'Customer', schema: customerMongooseSchema }]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

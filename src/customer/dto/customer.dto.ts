@@ -24,9 +24,11 @@ export const createCustomerSchemaZod = z.object({
   customerId: z.string().min(1,"Customer ID cannot be empty"),
   firstName: z.string().min(1,"Fist name is required"),
   lastName: z.string().min(1,"Last name is required"),
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
+  email: z.string().email("Invalid email address").min(1, "Email is required"), 
+  password : z.string().min(1, "Password cannot be empty").min(1, "password is required"),
   phone: z.string().optional(),
-  verified_email: z.boolean().optional(),
+  verified_email: z.boolean().optional(), 
+  passwordConfirmation: z.string().min(1, "Password cannot be empty"),
   addresses: z.array(addressSchemaZod).optional(),
   verifiedEmail: z.boolean().optional(),
   data: z.union([z.string().min(1, "Date cannot be empty"), z.date()]), // Simplesmente validando como Date no Zod
@@ -123,11 +125,14 @@ export class CreateCustomerDto extends createZodDto(createCustomerSchemaZod) {
 
   @ApiProperty({ description: 'Verified Email', required: true })
   verifiedEmail?: boolean;
+ 
+  @ApiProperty({ description: 'Password Confirmation', required: true }) 
+  passwordConfirmation: string; 
 
   @ApiProperty({ description: 'Address', example: '123 Main St', required: false })
   address?: string;
 
-  passwordConfirmation: any;
+
 }
 
 // Novo tipo de resposta CreateCustomerResponse

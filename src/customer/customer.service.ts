@@ -10,7 +10,7 @@ export class CustomerService {
   getCustomer: any;
 
   constructor(
-    @InjectModel(CustomerModel.name) private readonly customerModel: Model<ICustomer>
+    @InjectModel('Customer') private readonly customerModel: Model<ICustomer>
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<ICustomer> {
@@ -24,8 +24,13 @@ export class CustomerService {
     }
 
     // Cria e salva o cliente no MongoDB
+    try{
     const newCustomer = new this.customerModel(createCustomerDto);
     return await newCustomer.save();
+    } catch (error) {
+      console.error(error);
+    }
+    return ;
   }
 
   async createAccountActivationUrl(id: string): Promise<{ account_activation_url: string }> {

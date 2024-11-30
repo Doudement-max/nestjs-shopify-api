@@ -11,7 +11,7 @@ export class CustomerController {
 
   constructor(private readonly customerService: CustomerService) {}
 
-  @Post('create')
+  @Post()
   @ApiOperation({ summary: 'Create a new customer' })
   @ApiResponse({ status: 201, description: 'Customer created successfully', type: CreateCustomerResponse })
   @ApiResponse({ status: 400, description: 'Bad Request' })
